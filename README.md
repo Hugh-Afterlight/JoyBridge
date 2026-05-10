@@ -8,7 +8,7 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 
 Latest shared test version: `v0.2.0` / `2026-05-10`
 
-This version adds modifier-only mappings, improves Joy-Con input handling, and includes a dedicated correction for single left Joy-Con direction buttons. See [CHANGELOG.md](CHANGELOG.md) for details.
+This version adds modifier-only mappings, improves Joy-Con input handling, and includes a dedicated correction for single left Joy-Con direction buttons. Friend testing found that single Joy-Con shoulder/trigger buttons may not be exposed by Apple's `GameController.framework`. See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## MVP Features
 
@@ -35,6 +35,8 @@ This version adds modifier-only mappings, improves Joy-Con input handling, and i
 - DPad Down
 - DPad Left
 - DPad Right
+
+Note: these inputs are supported when Apple's `GameController.framework` exposes them for the connected controller. In current friend testing, single `Joy-Con (L)` and single `Joy-Con (R)` expose the face/direction buttons, but `L/R/ZL/ZR` do not report value changes, so JoyBridge cannot map those shoulder/trigger buttons in single Joy-Con mode yet.
 
 ## Default Mappings
 
@@ -92,6 +94,8 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 8. Change a mapping in the list and confirm the new action works. Set the Key picker to `None/无` when you want a modifier-only binding such as `Control`.
 9. Hold a controller button and confirm it does not continuously repeat.
 10. Release and press again to confirm it fires once more.
+
+For single Joy-Con testing, confirm the Xcode console shows `Button pressed`, `Mapping found`, and `Keyboard event sent`. If `L/R/ZL/ZR` do not print `Button pressed`, macOS is not exposing those physical buttons through `GameController.framework` for that connection mode.
 
 ## Current MVP Scope
 
@@ -163,7 +167,7 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 最新共享测试版本：`v0.2.0` / `2026-05-10`
 
-这个版本新增了纯修饰键映射，改进了 Joy-Con 输入识别，并针对单只左 Joy-Con 的方向键做了专用校正。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+这个版本新增了纯修饰键映射，改进了 Joy-Con 输入识别，并针对单只左 Joy-Con 的方向键做了专用校正。朋友测试发现，单只 Joy-Con 的肩键/扳机键可能不会被 Apple 的 `GameController.framework` 暴露出来。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
 
 ## MVP 功能
 
@@ -190,6 +194,8 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 - DPad Down
 - DPad Left
 - DPad Right
+
+注意：这些输入的前提是 Apple 的 `GameController.framework` 能从当前连接的控制器里暴露出对应按钮。当前朋友测试中，单只 `Joy-Con (L)` 和单只 `Joy-Con (R)` 可以识别面键/方向键，但 `L/R/ZL/ZR` 不会上报数值变化，所以 JoyBridge 当前无法在单只 Joy-Con 模式下映射这些肩键/扳机键。
 
 ## 默认映射
 
@@ -247,6 +253,8 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 8. 修改映射列表中的按键，确认新的映射生效。需要纯修饰键映射时，可以把 Key 选择器设为 `None/无`，例如只触发 `Control`。
 9. 长按手柄按钮，确认不会连续疯狂触发。
 10. 松开后再次按下，确认可以再次触发。
+
+测试单只 Joy-Con 时，请以 Xcode 控制台中的 `Button pressed`、`Mapping found`、`Keyboard event sent` 为准。如果按 `L/R/ZL/ZR` 时没有出现 `Button pressed`，说明 macOS 当前没有通过 `GameController.framework` 暴露这些实体按键。
 
 ## 当前 MVP 范围
 

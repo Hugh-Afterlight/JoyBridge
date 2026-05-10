@@ -36,6 +36,7 @@ struct ContentView: View {
                 Text("2. 授权 Accessibility")
                 Text("3. 修改映射")
                 Text("4. 按下手柄按钮测试")
+                Text("5. 单只 Joy-Con 的 L/R/ZL/ZR 可能受 macOS GameController 限制，若日志没有 Button pressed，则当前版本无法映射")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 4)

@@ -4,6 +4,20 @@ import GameController
 
 @MainActor
 final class ControllerManager: ObservableObject {
+    private struct PolledButtonInput {
+        let name: String
+        let input: GCControllerButtonInput
+        let button: ControllerButton?
+        let profile: String
+    }
+
+    private struct PolledAxisInput {
+        let name: String
+        let input: GCControllerAxisInput
+        let button: ControllerButton?
+        let profile: String
+    }
+
     @Published private(set) var connectedControllerName: String?
     @Published private(set) var latestPressedButton: ControllerButton?
 
@@ -18,6 +32,11 @@ final class ControllerManager: ObservableObject {
     private var isDiscoveringControllers = false
     private let dpadThreshold: Float = 0.5
     private var usesLeftJoyConDirectionalFaceButtonCorrection = false
+    private var physicalInputPollingTimer: Timer?
+    private var polledButtonInputs: [PolledButtonInput] = []
+    private var polledAxisInputs: [PolledAxisInput] = []
+    private var activeDiagnosticButtons = Set<String>()
+    private var activeDiagnosticAxes = Set<String>()
 
     init(mappingManager: MappingManager) {
         self.mappingManager = mappingManager
@@ -27,6 +46,8 @@ final class ControllerManager: ObservableObject {
     }
 
     deinit {
+        physicalInputPollingTimer?.invalidate()
+
         for observer in notificationObservers {
             NotificationCenter.default.removeObserver(observer)
         }
@@ -39,6 +60,7 @@ final class ControllerManager: ObservableObject {
         if let controller = controllers.first {
             configure(controller)
         } else {
+            stopPhysicalInputPolling()
             mappingManager.releaseAllHeldModifiers()
             activeController = nil
             connectedControllerName = nil
@@ -97,6 +119,7 @@ final class ControllerManager: ObservableObject {
     }
 
     private func configure(_ controller: GCController) {
+        stopPhysicalInputPolling()
         mappingManager.releaseAllHeldModifiers()
         activeController = controller
         connectedControllerName = controller.vendorName ?? "Unknown Controller"
@@ -118,6 +141,7 @@ final class ControllerManager: ObservableObject {
         }
 
         configurePhysicalInputProfile(controller.physicalInputProfile)
+        startPhysicalInputPolling()
 
         if controller.extendedGamepad == nil && controller.microGamepad == nil {
             print("Controller connected but no supported gamepad profile was available")
@@ -130,6 +154,7 @@ final class ControllerManager: ObservableObject {
         }
 
         print("Controller disconnected")
+        stopPhysicalInputPolling()
         mappingManager.releaseAllHeldModifiers()
         activeController = nil
         connectedControllerName = nil
@@ -166,9 +191,11 @@ final class ControllerManager: ObservableObject {
 
     private func configurePhysicalInputProfile(_ profile: GCPhysicalInputProfile) {
         let buttonNames = profile.buttons.keys.sorted()
+        let axisNames = profile.axes.keys.sorted()
         let dpadNames = profile.dpads.keys.sorted()
 
         print("Physical input buttons: \(joinedNames(buttonNames))")
+        print("Physical input axes: \(joinedNames(axisNames))")
         print("Physical input dpads: \(joinedNames(dpadNames))")
 
         for name in dpadNames {
@@ -176,15 +203,56 @@ final class ControllerManager: ObservableObject {
             bindDPad(dpad, profile: "physicalInputProfile.\(name)")
         }
 
-        for name in buttonNames {
-            guard
-                let input = profile.buttons[name],
-                let button = controllerButton(forPhysicalButton: input, name: name)
-            else {
+        for name in axisNames {
+            guard let input = profile.axes[name] else {
                 continue
             }
 
-            bind(input, to: button, profile: "physicalInputProfile.\(name)")
+            let profileName = "physicalInputProfile.\(name)"
+            let button = controllerButton(forInputName: name)
+
+            if shouldPollPhysicalAxis(name: name, button: button) {
+                polledAxisInputs.append(
+                    PolledAxisInput(
+                        name: name,
+                        input: input,
+                        button: button == .leftTrigger || button == .rightTrigger ? button : nil,
+                        profile: profileName
+                    )
+                )
+            }
+
+            if let button, button == .leftTrigger || button == .rightTrigger {
+                bindTriggerAxis(input, to: button, profile: profileName)
+            } else {
+                bindDiagnosticAxis(input, name: name, profile: profileName)
+            }
+        }
+
+        for name in buttonNames {
+            guard let input = profile.buttons[name] else {
+                continue
+            }
+
+            let profileName = "physicalInputProfile.\(name)"
+            let button = controllerButton(forPhysicalButton: input, name: name)
+
+            if shouldPollPhysicalButton(name: name, button: button) {
+                polledButtonInputs.append(
+                    PolledButtonInput(
+                        name: name,
+                        input: input,
+                        button: button,
+                        profile: profileName
+                    )
+                )
+            }
+
+            if let button {
+                bind(input, to: button, profile: profileName)
+            } else {
+                bindDiagnosticButton(input, name: name, profile: profileName)
+            }
         }
 
         profile.valueDidChangeHandler = { [weak self] _, element in
@@ -208,6 +276,47 @@ final class ControllerManager: ObservableObject {
                 let formattedValue = String(format: "%.2f", value)
                 print("Button value changed [\(profile)]: \(button.displayName), value=\(formattedValue), pressed=\(isPressed)")
                 self?.handleButton(button, isPressed: isPressed, profile: "\(profile).value")
+            }
+        }
+    }
+
+    private func bindDiagnosticButton(_ input: GCControllerButtonInput, name: String, profile: String) {
+        print("Bound \(profile) diagnostic button handler: \(name)")
+
+        input.valueChangedHandler = { _, value, isPressed in
+            DispatchQueue.main.async {
+                let formattedValue = String(format: "%.2f", value)
+                print("Unmapped physical button changed [\(profile)]: name=\(name), value=\(formattedValue), pressed=\(isPressed)")
+            }
+        }
+
+        input.pressedChangedHandler = { _, value, isPressed in
+            DispatchQueue.main.async {
+                let formattedValue = String(format: "%.2f", value)
+                print("Unmapped physical button pressed change [\(profile)]: name=\(name), value=\(formattedValue), pressed=\(isPressed)")
+            }
+        }
+    }
+
+    private func bindTriggerAxis(_ input: GCControllerAxisInput, to button: ControllerButton, profile: String) {
+        print("Bound \(profile) trigger axis handler: \(button.displayName)")
+
+        input.valueChangedHandler = { [weak self] _, value in
+            DispatchQueue.main.async {
+                let formattedValue = String(format: "%.2f", value)
+                print("Trigger axis changed [\(profile)]: \(button.displayName), value=\(formattedValue)")
+                self?.handleButton(button, isPressed: value > 0.5, profile: "\(profile).axis")
+            }
+        }
+    }
+
+    private func bindDiagnosticAxis(_ input: GCControllerAxisInput, name: String, profile: String) {
+        print("Bound \(profile) diagnostic axis handler: \(name)")
+
+        input.valueChangedHandler = { _, value in
+            DispatchQueue.main.async {
+                let formattedValue = String(format: "%.2f", value)
+                print("Unmapped physical axis changed [\(profile)]: name=\(name), value=\(formattedValue)")
             }
         }
     }
@@ -292,6 +401,76 @@ final class ControllerManager: ObservableObject {
             print("Button released [\(profile)]: \(button.displayName)")
             mappingManager.handleButtonRelease(button)
         }
+    }
+
+    private func startPhysicalInputPolling() {
+        guard !polledButtonInputs.isEmpty || !polledAxisInputs.isEmpty else {
+            return
+        }
+
+        physicalInputPollingTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.pollPhysicalInputs()
+            }
+        }
+        physicalInputPollingTimer?.tolerance = 0.01
+        print("Physical input polling started")
+    }
+
+    private func stopPhysicalInputPolling() {
+        physicalInputPollingTimer?.invalidate()
+        physicalInputPollingTimer = nil
+        polledButtonInputs.removeAll()
+        polledAxisInputs.removeAll()
+        activeDiagnosticButtons.removeAll()
+        activeDiagnosticAxes.removeAll()
+    }
+
+    private func pollPhysicalInputs() {
+        for item in polledButtonInputs {
+            if let button = item.button {
+                handleButton(button, isPressed: item.input.isPressed, profile: "\(item.profile).poll")
+            } else {
+                handleDiagnosticButtonPoll(item)
+            }
+        }
+
+        for item in polledAxisInputs {
+            if let button = item.button {
+                handleButton(button, isPressed: item.input.value > 0.5, profile: "\(item.profile).poll")
+            } else {
+                handleDiagnosticAxisPoll(item)
+            }
+        }
+    }
+
+    private func handleDiagnosticButtonPoll(_ item: PolledButtonInput) {
+        let key = item.profile
+        let isPressed = item.input.isPressed
+
+        if isPressed {
+            guard activeDiagnosticButtons.insert(key).inserted else { return }
+        } else {
+            guard activeDiagnosticButtons.remove(key) != nil else { return }
+        }
+
+        let formattedValue = String(format: "%.2f", item.input.value)
+        print("Unmapped physical button poll changed [\(item.profile)]: name=\(item.name), value=\(formattedValue), pressed=\(isPressed)")
+    }
+
+    private func handleDiagnosticAxisPoll(_ item: PolledAxisInput) {
+        let key = item.profile
+        let value = item.input.value
+        let isActive = abs(value) > 0.5
+
+        if isActive {
+            guard activeDiagnosticAxes.insert(key).inserted else { return }
+        } else {
+            guard activeDiagnosticAxes.remove(key) != nil else { return }
+        }
+
+        let formattedValue = String(format: "%.2f", value)
+        print("Unmapped physical axis poll changed [\(item.profile)]: name=\(item.name), value=\(formattedValue), active=\(isActive)")
     }
 
     private func controllerButton(forPhysicalButton input: GCControllerButtonInput, name: String?) -> ControllerButton? {
@@ -395,6 +574,26 @@ final class ControllerManager: ObservableObject {
         default:
             return nil
         }
+    }
+
+    private func shouldPollPhysicalButton(name: String, button: ControllerButton?) -> Bool {
+        if let button {
+            return button == .leftShoulder
+                || button == .rightShoulder
+                || button == .leftTrigger
+                || button == .rightTrigger
+        }
+
+        let normalizedName = normalizedInputName(name)
+        return normalizedName.contains("shoulder") || normalizedName.contains("trigger")
+    }
+
+    private func shouldPollPhysicalAxis(name: String, button: ControllerButton?) -> Bool {
+        if let button {
+            return button == .leftTrigger || button == .rightTrigger
+        }
+
+        return normalizedInputName(name).contains("trigger")
     }
 
     private func controllerButton(forDPadInputName name: String) -> ControllerButton? {
