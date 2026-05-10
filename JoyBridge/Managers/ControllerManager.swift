@@ -2,8 +2,24 @@ import Combine
 import Foundation
 import GameController
 
+struct ControllerDevice: Identifiable, Hashable {
+    let id: String
+    let name: String
+    let productCategory: String
+
+    var displayName: String {
+        if productCategory.isEmpty || productCategory == name {
+            return name
+        }
+
+        return "\(name) - \(productCategory)"
+    }
+}
+
 @MainActor
 final class ControllerManager: ObservableObject {
+    static let automaticTargetID = "__joybridge_automatic_target__"
+
     private struct PolledButtonInput {
         let name: String
         let input: GCControllerButtonInput
@@ -20,9 +36,24 @@ final class ControllerManager: ObservableObject {
 
     @Published private(set) var connectedControllerName: String?
     @Published private(set) var latestPressedButton: ControllerButton?
+    @Published private(set) var availableControllers: [ControllerDevice] = []
+    @Published private(set) var selectedTargetControllerID: String?
+    @Published private(set) var selectedTargetControllerName: String?
 
     var isControllerConnected: Bool {
         connectedControllerName != nil
+    }
+
+    var isTargetControllerSelected: Bool {
+        selectedTargetControllerID != nil
+    }
+
+    var isSelectedTargetConnected: Bool {
+        guard let selectedTargetControllerID else {
+            return true
+        }
+
+        return availableControllers.contains { $0.id == selectedTargetControllerID }
     }
 
     private let mappingManager: MappingManager
@@ -38,8 +69,13 @@ final class ControllerManager: ObservableObject {
     private var activeDiagnosticButtons = Set<String>()
     private var activeDiagnosticAxes = Set<String>()
 
+    private static let targetControllerIDDefaultsKey = "joybridge.targetControllerID"
+    private static let targetControllerNameDefaultsKey = "joybridge.targetControllerName"
+
     init(mappingManager: MappingManager) {
         self.mappingManager = mappingManager
+        selectedTargetControllerID = UserDefaults.standard.string(forKey: Self.targetControllerIDDefaultsKey)
+        selectedTargetControllerName = UserDefaults.standard.string(forKey: Self.targetControllerNameDefaultsKey)
         GCController.shouldMonitorBackgroundEvents = true
         setupNotifications()
         scanControllers()
@@ -57,19 +93,55 @@ final class ControllerManager: ObservableObject {
         print("Controller scan started")
 
         let controllers = GCController.controllers()
-        if let controller = controllers.first {
+        updateAvailableControllers(controllers)
+
+        if let controller = controllerForCurrentTarget(in: controllers) {
             configure(controller)
         } else {
-            stopPhysicalInputPolling()
-            mappingManager.releaseAllHeldModifiers()
-            activeController = nil
-            connectedControllerName = nil
-            latestPressedButton = nil
-            usesLeftJoyConDirectionalFaceButtonCorrection = false
-            pressedButtons.removeAll()
+            if let selectedTargetControllerName {
+                print("Target controller not connected: \(selectedTargetControllerName)")
+            }
+
+            clearActiveController()
         }
 
         startWirelessDiscoveryIfNeeded()
+    }
+
+    func selectTargetController(id: String?) {
+        if let id {
+            let displayName = availableControllers.first { $0.id == id }?.displayName
+                ?? selectedTargetControllerName
+                ?? id
+            selectedTargetControllerID = id
+            selectedTargetControllerName = displayName
+            UserDefaults.standard.set(id, forKey: Self.targetControllerIDDefaultsKey)
+            UserDefaults.standard.set(displayName, forKey: Self.targetControllerNameDefaultsKey)
+            print("Target controller selected: \(displayName)")
+        } else {
+            selectedTargetControllerID = nil
+            selectedTargetControllerName = nil
+            UserDefaults.standard.removeObject(forKey: Self.targetControllerIDDefaultsKey)
+            UserDefaults.standard.removeObject(forKey: Self.targetControllerNameDefaultsKey)
+            print("Target controller cleared; automatic controller selection enabled")
+        }
+
+        scanControllers()
+    }
+
+    func lockCurrentControllerAsTarget() {
+        guard let activeController else {
+            print("Cannot lock target controller because no controller is active")
+            return
+        }
+
+        let id = controllerIdentifier(for: activeController)
+        selectedTargetControllerID = id
+        selectedTargetControllerName = controllerDisplayName(for: activeController)
+        UserDefaults.standard.set(id, forKey: Self.targetControllerIDDefaultsKey)
+        UserDefaults.standard.set(selectedTargetControllerName, forKey: Self.targetControllerNameDefaultsKey)
+        print("Target controller locked: \(selectedTargetControllerName ?? id)")
+        scanControllers()
     }
 
     private func setupNotifications() {
@@ -85,10 +157,10 @@ final class ControllerManager: ObservableObject {
                     guard let self else { return }
 
                     if let controller = notification.object as? GCController {
-                        self.configure(controller)
-                    } else {
-                        self.scanControllers()
+                        print("Controller connected notification: \(controller.vendorName ?? "Unknown Controller")")
                     }
+
+                    self.scanControllers()
                 }
             }
         )
@@ -118,7 +190,38 @@ final class ControllerManager: ObservableObject {
         }
     }
 
+    private func updateAvailableControllers(_ controllers: [GCController]) {
+        availableControllers = controllers.map { controller in
+            ControllerDevice(
+                id: controllerIdentifier(for: controller),
+                name: controller.vendorName ?? "Unknown Controller",
+                productCategory: controller.productCategory
+            )
+        }
+
+        if availableControllers.isEmpty {
+            print("Available controllers: none")
+        } else {
+            let names = availableControllers.map(\.displayName).joined(separator: ", ")
+            print("Available controllers: \(names)")
+        }
+    }
+
+    private func controllerForCurrentTarget(in controllers: [GCController]) -> GCController? {
+        guard let selectedTargetControllerID else {
+            return controllers.first
+        }
+
+        return controllers.first { controller in
+            controllerIdentifier(for: controller) == selectedTargetControllerID
+        }
+    }
+
     private func configure(_ controller: GCController) {
+        if let activeController, activeController !== controller {
+            clearHandlers(for: activeController)
+        }
+
         stopPhysicalInputPolling()
         mappingManager.releaseAllHeldModifiers()
         activeController = controller
@@ -150,10 +253,20 @@ final class ControllerManager: ObservableObject {
 
     private func handleControllerDisconnected(_ controller: GCController?) {
         guard controller == nil || controller === activeController else {
+            scanControllers()
             return
         }
 
         print("Controller disconnected")
+        clearActiveController()
+        scanControllers()
+    }
+
+    private func clearActiveController() {
+        if let activeController {
+            clearHandlers(for: activeController)
+        }
+
         stopPhysicalInputPolling()
         mappingManager.releaseAllHeldModifiers()
         activeController = nil
@@ -161,7 +274,54 @@ final class ControllerManager: ObservableObject {
         latestPressedButton = nil
         usesLeftJoyConDirectionalFaceButtonCorrection = false
         pressedButtons.removeAll()
-        scanControllers()
+    }
+
+    private func clearHandlers(for controller: GCController) {
+        if let gamepad = controller.extendedGamepad {
+            clearHandler(for: gamepad.buttonA)
+            clearHandler(for: gamepad.buttonB)
+            clearHandler(for: gamepad.buttonX)
+            clearHandler(for: gamepad.buttonY)
+            clearHandler(for: gamepad.leftShoulder)
+            clearHandler(for: gamepad.rightShoulder)
+            clearHandler(for: gamepad.leftTrigger)
+            clearHandler(for: gamepad.rightTrigger)
+            clearHandlers(for: gamepad.dpad)
+        }
+
+        if let gamepad = controller.microGamepad {
+            clearHandler(for: gamepad.buttonA)
+            clearHandler(for: gamepad.buttonX)
+            clearHandlers(for: gamepad.dpad)
+        }
+
+        let profile = controller.physicalInputProfile
+        profile.valueDidChangeHandler = nil
+
+        for input in profile.buttons.values {
+            clearHandler(for: input)
+        }
+
+        for input in profile.axes.values {
+            input.valueChangedHandler = nil
+        }
+
+        for dpad in profile.dpads.values {
+            clearHandlers(for: dpad)
+        }
+    }
+
+    private func clearHandler(for input: GCControllerButtonInput) {
+        input.pressedChangedHandler = nil
+        input.valueChangedHandler = nil
+    }
+
+    private func clearHandlers(for dpad: GCControllerDirectionPad) {
+        dpad.valueChangedHandler = nil
+        clearHandler(for: dpad.up)
+        clearHandler(for: dpad.down)
+        clearHandler(for: dpad.left)
+        clearHandler(for: dpad.right)
     }
 
     private func configureExtendedGamepad(_ gamepad: GCExtendedGamepad) {
@@ -659,6 +819,32 @@ final class ControllerManager: ObservableObject {
 
     private func joinedNames(_ names: [String]) -> String {
         names.isEmpty ? "none" : names.joined(separator: ", ")
+    }
+
+    private func controllerDisplayName(for controller: GCController) -> String {
+        let name = controller.vendorName ?? "Unknown Controller"
+        let productCategory = controller.productCategory
+
+        if productCategory.isEmpty || productCategory == name {
+            return name
+        }
+
+        return "\(name) - \(productCategory)"
+    }
+
+    private func controllerIdentifier(for controller: GCController) -> String {
+        let vendorName = controller.vendorName ?? "Unknown Controller"
+        let profileParts = [
+            controller.extendedGamepad == nil ? "noExtended" : "extended",
+            controller.microGamepad == nil ? "noMicro" : "micro"
+        ]
+
+        return [
+            vendorName,
+            controller.productCategory,
+            profileParts.joined(separator: "+")
+        ]
+        .joined(separator: "|")
     }
 
     private func isLeftJoyCon(_ controller: GCController) -> Bool {

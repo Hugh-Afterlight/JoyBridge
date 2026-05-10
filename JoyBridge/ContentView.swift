@@ -34,9 +34,10 @@ struct ContentView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("1. 先连接 Joy-Con")
                 Text("2. 授权 Accessibility")
-                Text("3. 修改映射")
-                Text("4. 按下手柄按钮测试")
-                Text("5. 建议同时连接左右 Joy-Con；单只 Joy-Con 的 L/R/ZL/ZR 可能受 macOS GameController 限制")
+                Text("3. 点击“锁定当前”，避免响应其他蓝牙手柄")
+                Text("4. 修改映射")
+                Text("5. 按下手柄按钮测试")
+                Text("6. 建议同时连接左右 Joy-Con；单只 Joy-Con 的 L/R/ZL/ZR 可能受 macOS GameController 限制")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 4)

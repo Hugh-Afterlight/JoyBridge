@@ -1,5 +1,55 @@
 # Changelog
 
+## v0.3.0 - 2026-05-10
+
+### English
+
+This update adds target controller locking, the first step toward making JoyBridge safer as an installable daily-use app.
+
+Changed:
+
+- Added a target controller picker in the controller status section.
+- Added `锁定当前`, which saves the currently active controller as the target controller.
+- Added target controller persistence through `UserDefaults`.
+- JoyBridge now scans all connected controllers but only configures the selected target controller when a target is locked.
+- Connection notifications now rescan through the same target-selection logic instead of automatically switching to the newest connected controller.
+- When the target controller is missing, JoyBridge clears the active controller and does not automatically respond to another Bluetooth controller.
+- Added cleanup for old GameController handlers when switching or clearing the active controller, reducing the risk of stale callbacks from a previously active controller.
+
+Validation:
+
+- Built successfully with Xcode/macOS Debug target.
+- Verified that the existing mapping code was not moved into the UI or `MappingManager`.
+
+Known limitations:
+
+- The target controller identity uses GameController-visible metadata such as vendor name, product category, and profile type. This is enough for distinguishing common different controller types, but it may not reliably distinguish two identical controllers across launches.
+- This is still an Xcode-run test build, not a packaged `.dmg`.
+
+### 中文
+
+本次更新新增“目标控制器锁定”，这是把 JoyBridge 做成日常可安装 App 前的第一步安全改进。
+
+本次更新：
+
+- 在控制器状态区域新增目标控制器选择器。
+- 新增 `锁定当前`，可以把当前正在使用的控制器保存为目标控制器。
+- 使用 `UserDefaults` 保存目标控制器选择。
+- JoyBridge 现在会扫描所有已连接控制器，但锁定目标后只配置被选中的目标控制器。
+- 控制器连接通知现在统一走目标选择逻辑，不再因为新连接了其他手柄就自动切换过去。
+- 如果目标控制器没有连接，JoyBridge 会清空当前活动控制器，并且不会自动响应其他蓝牙手柄。
+- 切换或清空活动控制器时，会清理旧的 GameController 回调，降低旧控制器残留回调误触发的风险。
+
+验证结果：
+
+- Xcode/macOS Debug 目标构建成功。
+- 确认没有把映射逻辑移动到 UI 或 `MappingManager` 中。
+
+已知限制：
+
+- 目标控制器身份使用 GameController 能看到的 vendor name、product category、profile type 等信息。它足够区分常见的不同类型手柄，但如果同时使用两只完全同型号手柄，跨启动后仍可能无法精确区分。
+- 当前仍然是 Xcode 运行的测试版，还不是打包好的 `.dmg`。
+
 ## v0.2.2 - 2026-05-10
 
 ### English

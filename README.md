@@ -6,9 +6,9 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 
 ## Current Test Version
 
-Latest shared test version: `v0.2.2` / `2026-05-10`
+Latest shared test version: `v0.3.0` / `2026-05-10`
 
-This version adds modifier-only mappings, improves Joy-Con input handling, includes a dedicated correction for single left Joy-Con direction buttons, and documents the confirmed Joy-Con pairing behavior. See [CHANGELOG.md](CHANGELOG.md) for details.
+This version adds target controller locking so JoyBridge can listen only to the controller you choose and avoid reacting to other Bluetooth controllers. It also keeps the Joy-Con pairing notes from the previous test builds. See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## MVP Features
 
@@ -19,6 +19,7 @@ This version adds modifier-only mappings, improves Joy-Con input handling, inclu
 - Custom button-to-key mappings stored in `UserDefaults`
 - Single-key shortcuts, modifier-only bindings, and modifier combinations such as `Command + C` or `Command + Shift + S`
 - Debounced controller input so holding a button does not repeatedly fire
+- Target controller selection and locking, so other connected controllers do not trigger mappings
 - Controller status, latest pressed button, and editable mapping list in the UI
 
 ## Supported Controller Inputs
@@ -87,13 +88,16 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 1. Pair a Joy-Con or Switch Pro Controller in macOS Bluetooth settings.
 2. Open JoyBridge and click `重新检测控制器`.
 3. Confirm that the controller name appears.
-4. Press controller buttons and confirm `最近按键` updates.
-5. Open TextEdit or another text field.
-6. Press `A` to test Space.
-7. Select text and press `X` / `Y` to test copy and paste.
-8. Change a mapping in the list and confirm the new action works. Set the Key picker to `None/无` when you want a modifier-only binding such as `Control`.
-9. Hold a controller button and confirm it does not continuously repeat.
-10. Release and press again to confirm it fires once more.
+4. Click `锁定当前` to save the current controller as the target controller.
+5. Press controller buttons and confirm `最近按键` updates.
+6. Open TextEdit or another text field.
+7. Press `A` to test Space.
+8. Select text and press `X` / `Y` to test copy and paste.
+9. Change a mapping in the list and confirm the new action works. Set the Key picker to `None/无` when you want a modifier-only binding such as `Control`.
+10. Hold a controller button and confirm it does not continuously repeat.
+11. Release and press again to confirm it fires once more.
+
+After a target controller is locked, JoyBridge should only respond to that saved controller. If the target controller is not connected, JoyBridge should not automatically switch to another Bluetooth controller.
 
 For Joy-Con testing, connecting both left and right Joy-Cons at the same time is recommended. Confirm the Xcode console shows `Button pressed`, `Mapping found`, and `Keyboard event sent`. If `L/R/ZL/ZR` do not print `Button pressed` when only one Joy-Con is connected, macOS is not exposing those physical buttons through `GameController.framework` for that single-controller mode.
 
@@ -165,9 +169,9 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 ## 当前测试版本
 
-最新共享测试版本：`v0.2.2` / `2026-05-10`
+最新共享测试版本：`v0.3.0` / `2026-05-10`
 
-这个版本新增了纯修饰键映射，改进了 Joy-Con 输入识别，针对单只左 Joy-Con 的方向键做了专用校正，并记录了已确认的 Joy-Con 连接方式差异。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+这个版本新增了目标控制器锁定功能，让 JoyBridge 只监听你选择的控制器，避免响应其他蓝牙手柄。同时保留之前测试版里的 Joy-Con 连接方式说明。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
 
 ## MVP 功能
 
@@ -178,6 +182,7 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 - 使用 `UserDefaults` 保存自定义映射
 - 支持单键、纯修饰键映射和组合键，例如 `Command + C`、`Command + Shift + S`
 - 防止长按按钮时无限重复触发
+- 支持选择并锁定目标控制器，避免其他已连接手柄触发映射
 - 界面显示控制器状态、最近按下按钮和可编辑映射列表
 
 ## 支持的手柄按钮
@@ -246,13 +251,16 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 1. 在 macOS 蓝牙设置中连接 Joy-Con 或 Switch Pro Controller。
 2. 打开 JoyBridge，点击 `重新检测控制器`。
 3. 确认界面显示控制器名称。
-4. 按手柄按钮，确认 `最近按键` 更新。
-5. 打开 TextEdit 或其他输入框。
-6. 按 `A` 测试 Space。
-7. 选中文本后按 `X` / `Y` 测试复制和粘贴。
-8. 修改映射列表中的按键，确认新的映射生效。需要纯修饰键映射时，可以把 Key 选择器设为 `None/无`，例如只触发 `Control`。
-9. 长按手柄按钮，确认不会连续疯狂触发。
-10. 松开后再次按下，确认可以再次触发。
+4. 点击 `锁定当前`，把当前控制器保存为目标控制器。
+5. 按手柄按钮，确认 `最近按键` 更新。
+6. 打开 TextEdit 或其他输入框。
+7. 按 `A` 测试 Space。
+8. 选中文本后按 `X` / `Y` 测试复制和粘贴。
+9. 修改映射列表中的按键，确认新的映射生效。需要纯修饰键映射时，可以把 Key 选择器设为 `None/无`，例如只触发 `Control`。
+10. 长按手柄按钮，确认不会连续疯狂触发。
+11. 松开后再次按下，确认可以再次触发。
+
+锁定目标控制器后，JoyBridge 应该只响应这个已保存的控制器。如果目标控制器没有连接，JoyBridge 不应该自动切换到其他蓝牙手柄。
 
 测试 Joy-Con 时，建议同时连接左右两个 Joy-Con。请以 Xcode 控制台中的 `Button pressed`、`Mapping found`、`Keyboard event sent` 为准。如果只连接单只 Joy-Con 时按 `L/R/ZL/ZR` 没有出现 `Button pressed`，说明 macOS 当前没有通过 `GameController.framework` 暴露这些实体按键。
 
