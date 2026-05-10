@@ -6,9 +6,9 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 
 ## Current Test Version
 
-Latest shared test version: `v0.2.1` / `2026-05-10`
+Latest shared test version: `v0.2.2` / `2026-05-10`
 
-This version adds modifier-only mappings, improves Joy-Con input handling, includes a dedicated correction for single left Joy-Con direction buttons, and documents the confirmed single Joy-Con shoulder/trigger limitation. See [CHANGELOG.md](CHANGELOG.md) for details.
+This version adds modifier-only mappings, improves Joy-Con input handling, includes a dedicated correction for single left Joy-Con direction buttons, and documents the confirmed Joy-Con pairing behavior. See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## MVP Features
 
@@ -36,7 +36,7 @@ This version adds modifier-only mappings, improves Joy-Con input handling, inclu
 - DPad Left
 - DPad Right
 
-Note: these inputs are supported when Apple's `GameController.framework` exposes them for the connected controller. In current friend testing, single `Joy-Con (L)` and single `Joy-Con (R)` expose the face/direction buttons, but `L/R/ZL/ZR` do not report value changes, so JoyBridge cannot map those shoulder/trigger buttons in single Joy-Con mode yet.
+Note: these inputs are supported when Apple's `GameController.framework` exposes them for the connected controller. In current friend testing, connecting both left and right Joy-Cons at the same time allows DPad, `A/B/X/Y`, and `L/R/ZL/ZR` to work. When using only a single `Joy-Con (L)` or single `Joy-Con (R)`, the face/direction buttons work, but `L/R/ZL/ZR` may not report value changes.
 
 ## Default Mappings
 
@@ -95,7 +95,7 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 9. Hold a controller button and confirm it does not continuously repeat.
 10. Release and press again to confirm it fires once more.
 
-For single Joy-Con testing, confirm the Xcode console shows `Button pressed`, `Mapping found`, and `Keyboard event sent`. If `L/R/ZL/ZR` do not print `Button pressed`, macOS is not exposing those physical buttons through `GameController.framework` for that connection mode.
+For Joy-Con testing, connecting both left and right Joy-Cons at the same time is recommended. Confirm the Xcode console shows `Button pressed`, `Mapping found`, and `Keyboard event sent`. If `L/R/ZL/ZR` do not print `Button pressed` when only one Joy-Con is connected, macOS is not exposing those physical buttons through `GameController.framework` for that single-controller mode.
 
 ## Current MVP Scope
 
@@ -165,9 +165,9 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 ## 当前测试版本
 
-最新共享测试版本：`v0.2.1` / `2026-05-10`
+最新共享测试版本：`v0.2.2` / `2026-05-10`
 
-这个版本新增了纯修饰键映射，改进了 Joy-Con 输入识别，针对单只左 Joy-Con 的方向键做了专用校正，并记录了已确认的单只 Joy-Con 肩键/扳机键限制。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+这个版本新增了纯修饰键映射，改进了 Joy-Con 输入识别，针对单只左 Joy-Con 的方向键做了专用校正，并记录了已确认的 Joy-Con 连接方式差异。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
 
 ## MVP 功能
 
@@ -195,7 +195,7 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 - DPad Left
 - DPad Right
 
-注意：这些输入的前提是 Apple 的 `GameController.framework` 能从当前连接的控制器里暴露出对应按钮。当前朋友测试中，单只 `Joy-Con (L)` 和单只 `Joy-Con (R)` 可以识别面键/方向键，但 `L/R/ZL/ZR` 不会上报数值变化，所以 JoyBridge 当前无法在单只 Joy-Con 模式下映射这些肩键/扳机键。
+注意：这些输入的前提是 Apple 的 `GameController.framework` 能从当前连接的控制器里暴露出对应按钮。当前朋友测试中，同时连接左右 Joy-Con 时，方向键、`A/B/X/Y` 和 `L/R/ZL/ZR` 都可以正常工作。只连接单只 `Joy-Con (L)` 或单只 `Joy-Con (R)` 时，面键/方向键可用，但 `L/R/ZL/ZR` 可能不会上报数值变化。
 
 ## 默认映射
 
@@ -254,7 +254,7 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 9. 长按手柄按钮，确认不会连续疯狂触发。
 10. 松开后再次按下，确认可以再次触发。
 
-测试单只 Joy-Con 时，请以 Xcode 控制台中的 `Button pressed`、`Mapping found`、`Keyboard event sent` 为准。如果按 `L/R/ZL/ZR` 时没有出现 `Button pressed`，说明 macOS 当前没有通过 `GameController.framework` 暴露这些实体按键。
+测试 Joy-Con 时，建议同时连接左右两个 Joy-Con。请以 Xcode 控制台中的 `Button pressed`、`Mapping found`、`Keyboard event sent` 为准。如果只连接单只 Joy-Con 时按 `L/R/ZL/ZR` 没有出现 `Button pressed`，说明 macOS 当前没有通过 `GameController.framework` 暴露这些实体按键。
 
 ## 当前 MVP 范围
 

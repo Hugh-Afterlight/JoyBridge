@@ -1,5 +1,57 @@
 # Changelog
 
+## v0.2.2 - 2026-05-10
+
+### English
+
+This update records the latest friend-test result for using both Joy-Cons together.
+
+Changed:
+
+- Updated the in-app tester note to recommend connecting both left and right Joy-Cons for fuller input coverage.
+- Updated the README with the confirmed Joy-Con pairing behavior:
+  - When both left and right Joy-Cons are connected at the same time, DPad, `A/B/X/Y`, and `L/R/ZL/ZR` work.
+  - When only a single Joy-Con is connected, face/direction buttons work, but `L/R/ZL/ZR` may not report value changes through `GameController.framework`.
+
+Validation:
+
+- Built successfully with Xcode/macOS Debug target.
+- Manually tested both Joy-Cons connected at the same time:
+  - DPad works.
+  - `A/B/X/Y` work.
+  - `L/R/ZL/ZR` work.
+
+Known limitations:
+
+- Single Joy-Con shoulder/trigger buttons (`L/R/ZL/ZR`) may still be unavailable when only one Joy-Con is paired.
+- Switch Pro Controller and compatible full controllers still need separate validation for shoulder/trigger buttons.
+- No packaged `.dmg` release yet. Friends still need to run the project from Xcode.
+
+### 中文
+
+本次更新记录了“左右 Joy-Con 同时连接”的最新朋友测试结果。
+
+本次更新：
+
+- 更新 App 内调试提示，建议同时连接左右 Joy-Con，以获得更完整的按键支持。
+- 更新 README，明确 Joy-Con 不同连接方式下的实测表现：
+  - 同时连接左右 Joy-Con 时，方向键、`A/B/X/Y` 和 `L/R/ZL/ZR` 都可以正常工作。
+  - 只连接单只 Joy-Con 时，面键/方向键可用，但 `L/R/ZL/ZR` 可能不会通过 `GameController.framework` 上报数值变化。
+
+验证结果：
+
+- Xcode/macOS Debug 目标构建成功。
+- 手动测试同时连接左右 Joy-Con：
+  - 方向键可用。
+  - `A/B/X/Y` 可用。
+  - `L/R/ZL/ZR` 可用。
+
+已知限制：
+
+- 只连接单只 Joy-Con 时，肩键/扳机键（`L/R/ZL/ZR`）可能仍然不可用。
+- Switch Pro Controller 和兼容完整手柄的肩键/扳机键还需要单独验证。
+- 暂时没有打包 `.dmg`，朋友仍然需要用 Xcode 运行项目。
+
 ## v0.2.1 - 2026-05-10
 
 ### English
