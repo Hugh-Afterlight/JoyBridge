@@ -22,8 +22,10 @@ struct MappingRowView: View {
                 }
 
                 Picker("Key", selection: keyBinding) {
+                    Text("None/无").tag(nil as KeyboardKey?)
+
                     ForEach(KeyboardKey.allCases) { key in
-                        Text(key.displayName).tag(key)
+                        Text(key.displayName).tag(key as KeyboardKey?)
                     }
                 }
                 .frame(width: 190)
@@ -31,7 +33,7 @@ struct MappingRowView: View {
                 Spacer()
             }
 
-            Text("预览：\(mapping.previewDescription)")
+            Text("预览：\(previewDescription)")
                 .font(.callout)
                 .foregroundStyle(.secondary)
         }
@@ -48,7 +50,7 @@ struct MappingRowView: View {
         }
     }
 
-    private var keyBinding: Binding<KeyboardKey> {
+    private var keyBinding: Binding<KeyboardKey?> {
         Binding {
             mapping.key
         } set: { key in
@@ -56,6 +58,24 @@ struct MappingRowView: View {
             updatedMapping.key = key
             onUpdate(updatedMapping)
         }
+    }
+
+    private var previewDescription: String {
+        "\(mapping.controllerButton.displayName) -> \(actionDisplayName)"
+    }
+
+    private var actionDisplayName: String {
+        let modifierNames = KeyModifier.orderedUnique(from: mapping.modifiers).map(\.displayName)
+
+        if let key = mapping.key {
+            return (modifierNames + [key.displayName]).joined(separator: " + ")
+        }
+
+        if modifierNames.isEmpty {
+            return "None/无"
+        }
+
+        return modifierNames.joined(separator: " + ")
     }
 
     private func modifierBinding(for modifier: KeyModifier) -> Binding<Bool> {

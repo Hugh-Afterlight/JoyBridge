@@ -3,14 +3,14 @@ import Foundation
 struct KeyMapping: Codable, Identifiable, Equatable {
     var id: String
     var controllerButton: ControllerButton
-    var key: KeyboardKey
+    var key: KeyboardKey?
     var modifiers: [KeyModifier]
     var isEnabled: Bool
 
     init(
         id: String? = nil,
         controllerButton: ControllerButton,
-        key: KeyboardKey,
+        key: KeyboardKey?,
         modifiers: [KeyModifier] = [],
         isEnabled: Bool = true
     ) {
@@ -23,6 +23,10 @@ struct KeyMapping: Codable, Identifiable, Equatable {
 
     var actionDisplayName: String {
         Self.actionDisplayName(key: key, modifiers: modifiers)
+    }
+
+    var action: MappingAction {
+        MappingAction(key: key, modifiers: modifiers)
     }
 
     var previewDescription: String {
@@ -56,8 +60,17 @@ struct KeyMapping: Codable, Identifiable, Equatable {
         )
     }
 
-    static func actionDisplayName(key: KeyboardKey, modifiers: [KeyModifier]) -> String {
+    static func actionDisplayName(key: KeyboardKey?, modifiers: [KeyModifier]) -> String {
         let modifierNames = KeyModifier.orderedUnique(from: modifiers).map(\.displayName)
-        return (modifierNames + [key.displayName]).joined(separator: " + ")
+
+        if let key {
+            return (modifierNames + [key.displayName]).joined(separator: " + ")
+        }
+
+        if !modifierNames.isEmpty {
+            return modifierNames.joined(separator: " + ")
+        }
+
+        return "None"
     }
 }

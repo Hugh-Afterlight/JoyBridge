@@ -4,6 +4,12 @@ JoyBridge is a native macOS productivity tool that maps Nintendo Joy-Con, Switch
 
 It is not a game utility. The goal is simple: turn controller buttons into customizable macOS keyboard shortcuts.
 
+## Current Test Version
+
+Latest shared test version: `v0.2.0` / `2026-05-10`
+
+This version adds modifier-only mappings, improves Joy-Con input handling, and includes a dedicated correction for single left Joy-Con direction buttons. See [CHANGELOG.md](CHANGELOG.md) for details.
+
 ## MVP Features
 
 - Native macOS app built with Swift, SwiftUI, and AppKit
@@ -11,7 +17,7 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 - Keyboard event simulation through CoreGraphics `CGEvent`
 - Accessibility permission detection and shortcut to System Settings
 - Custom button-to-key mappings stored in `UserDefaults`
-- Single-key shortcuts and modifier combinations such as `Command + C` or `Command + Shift + S`
+- Single-key shortcuts, modifier-only bindings, and modifier combinations such as `Command + C` or `Command + Shift + S`
 - Debounced controller input so holding a button does not repeatedly fire
 - Controller status, latest pressed button, and editable mapping list in the UI
 
@@ -83,13 +89,13 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 5. Open TextEdit or another text field.
 6. Press `A` to test Space.
 7. Select text and press `X` / `Y` to test copy and paste.
-8. Change a mapping in the list and confirm the new action works.
+8. Change a mapping in the list and confirm the new action works. Set the Key picker to `None/无` when you want a modifier-only binding such as `Control`.
 9. Hold a controller button and confirm it does not continuously repeat.
 10. Release and press again to confirm it fires once more.
 
 ## Current MVP Scope
 
-JoyBridge currently focuses only on custom controller-button-to-keyboard mappings.
+JoyBridge currently focuses only on custom controller-button-to-keyboard mappings, including single keys, modifier-only bindings, and key combinations.
 
 Not included in the first version:
 
@@ -153,6 +159,12 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 它不是游戏工具。它的目标很明确：让手柄按钮可以触发自定义键盘按键或快捷键。
 
+## 当前测试版本
+
+最新共享测试版本：`v0.2.0` / `2026-05-10`
+
+这个版本新增了纯修饰键映射，改进了 Joy-Con 输入识别，并针对单只左 Joy-Con 的方向键做了专用校正。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+
 ## MVP 功能
 
 - 使用 Swift、SwiftUI、AppKit 构建的 macOS 原生 App
@@ -160,7 +172,7 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 - 使用 CoreGraphics `CGEvent` 模拟键盘事件
 - 检测 Accessibility 辅助功能权限，并提供跳转系统设置的按钮
 - 使用 `UserDefaults` 保存自定义映射
-- 支持单键和组合键，例如 `Command + C`、`Command + Shift + S`
+- 支持单键、纯修饰键映射和组合键，例如 `Command + C`、`Command + Shift + S`
 - 防止长按按钮时无限重复触发
 - 界面显示控制器状态、最近按下按钮和可编辑映射列表
 
@@ -232,13 +244,13 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 5. 打开 TextEdit 或其他输入框。
 6. 按 `A` 测试 Space。
 7. 选中文本后按 `X` / `Y` 测试复制和粘贴。
-8. 修改映射列表中的按键，确认新的映射生效。
+8. 修改映射列表中的按键，确认新的映射生效。需要纯修饰键映射时，可以把 Key 选择器设为 `None/无`，例如只触发 `Control`。
 9. 长按手柄按钮，确认不会连续疯狂触发。
 10. 松开后再次按下，确认可以再次触发。
 
 ## 当前 MVP 范围
 
-JoyBridge 第一版只专注于自定义“手柄按钮 -> 键盘单键 / 键盘组合键”。
+JoyBridge 第一版只专注于自定义“手柄按钮 -> 键盘单键 / 纯修饰键 / 键盘组合键”。
 
 第一版暂不包含：
 

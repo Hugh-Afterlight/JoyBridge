@@ -9,6 +9,7 @@ final class MappingManager: ObservableObject {
     private let userDefaults: UserDefaults
     private let keyboardEventSender: KeyboardEventSender
     private let accessibilityPermissionManager: AccessibilityPermissionManager
+    private var activeModifierHolds: [ControllerButton: [KeyModifier]] = [:]
 
     init(
         accessibilityPermissionManager: AccessibilityPermissionManager,
@@ -27,6 +28,8 @@ final class MappingManager: ObservableObject {
     }
 
     func updateMapping(_ mapping: KeyMapping) {
+        releaseModifierHold(for: mapping.controllerButton)
+
         let normalizedMapping = mapping.normalized()
         var updatedMappings = mappings
 
@@ -57,7 +60,19 @@ final class MappingManager: ObservableObject {
         }
 
         print("Mapping found: \(mapping.previewDescription)")
-        keyboardEventSender.sendKeyCombo(key: mapping.key, modifiers: mapping.modifiers)
+        perform(mapping.action, for: button)
+    }
+
+    func handleButtonRelease(_ button: ControllerButton) {
+        releaseModifierHold(for: button)
+    }
+
+    func releaseAllHeldModifiers() {
+        let heldModifiers = KeyModifier.orderedUnique(from: activeModifierHolds.values.flatMap { $0 })
+        guard !heldModifiers.isEmpty else { return }
+
+        activeModifierHolds.removeAll()
+        keyboardEventSender.sendModifierKeyUp(modifiers: heldModifiers)
     }
 
     private func loadMappings() {
@@ -87,6 +102,55 @@ final class MappingManager: ObservableObject {
         } catch {
             print("Mappings save failed: \(error.localizedDescription)")
         }
+    }
+
+    private func perform(_ action: MappingAction, for button: ControllerButton) {
+        switch action {
+        case let .keyboard(key, modifiers):
+            let effectiveModifiers = modifiersIncludingActiveHolds(modifiers)
+            keyboardEventSender.sendKeyCombo(key: key, modifiers: effectiveModifiers)
+        case let .modifierOnly(modifiers):
+            startModifierHold(modifiers, for: button)
+        case .none:
+            print("Mapping has no action: \(button.displayName)")
+        }
+    }
+
+    private func startModifierHold(_ modifiers: [KeyModifier], for button: ControllerButton) {
+        let orderedModifiers = KeyModifier.orderedUnique(from: modifiers)
+        guard !orderedModifiers.isEmpty else { return }
+
+        let alreadyHeldModifiers = Set(activeModifierHolds.values.flatMap { $0 })
+        let modifiersToPress = orderedModifiers.filter { !alreadyHeldModifiers.contains($0) }
+
+        activeModifierHolds[button] = orderedModifiers
+
+        guard !modifiersToPress.isEmpty else {
+            print("Modifier hold already active: \(KeyMapping.actionDisplayName(key: nil, modifiers: orderedModifiers))")
+            return
+        }
+
+        keyboardEventSender.sendModifierKeyDown(modifiers: modifiersToPress)
+    }
+
+    private func releaseModifierHold(for button: ControllerButton) {
+        guard let releasedModifiers = activeModifierHolds.removeValue(forKey: button) else {
+            return
+        }
+
+        let stillHeldModifiers = Set(activeModifierHolds.values.flatMap { $0 })
+        let modifiersToRelease = releasedModifiers.filter { !stillHeldModifiers.contains($0) }
+
+        guard !modifiersToRelease.isEmpty else {
+            print("Modifier hold released, modifiers still held by another button")
+            return
+        }
+
+        keyboardEventSender.sendModifierKeyUp(modifiers: modifiersToRelease)
+    }
+
+    private func modifiersIncludingActiveHolds(_ modifiers: [KeyModifier]) -> [KeyModifier] {
+        KeyModifier.orderedUnique(from: activeModifierHolds.values.flatMap { $0 } + modifiers)
     }
 
     private func normalizedMappings(_ sourceMappings: [KeyMapping]) -> [KeyMapping] {

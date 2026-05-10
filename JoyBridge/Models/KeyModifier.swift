@@ -35,6 +35,20 @@ enum KeyModifier: String, CaseIterable, Codable, Identifiable {
         }
     }
 
+    var keyCode: CGKeyCode {
+        // Left-side macOS virtual key codes used for real modifier key events.
+        switch self {
+        case .command:
+            55
+        case .option:
+            58
+        case .control:
+            59
+        case .shift:
+            56
+        }
+    }
+
     static func eventFlags(for modifiers: [KeyModifier]) -> CGEventFlags {
         orderedUnique(from: modifiers).reduce(CGEventFlags(rawValue: 0)) { flags, modifier in
             flags.union(modifier.eventFlag)
