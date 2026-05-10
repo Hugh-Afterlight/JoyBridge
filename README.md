@@ -6,9 +6,9 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 
 ## Current Test Version
 
-Latest shared test version: `v0.3.0` / `2026-05-10`
+Latest shared test version: `v0.4.0` / `2026-05-10`
 
-This version adds target controller locking so JoyBridge can listen only to the controller you choose and avoid reacting to other Bluetooth controllers. It also keeps the Joy-Con pairing notes from the previous test builds. See [CHANGELOG.md](CHANGELOG.md) for details.
+This version adds a simple menu bar mode. Closing the main window no longer quits JoyBridge, and the menu bar item can reopen the window, rescan controllers, or quit the app. It also keeps target controller locking and the Joy-Con pairing notes from previous test builds. See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## MVP Features
 
@@ -20,6 +20,7 @@ This version adds target controller locking so JoyBridge can listen only to the 
 - Single-key shortcuts, modifier-only bindings, and modifier combinations such as `Command + C` or `Command + Shift + S`
 - Debounced controller input so holding a button does not repeatedly fire
 - Target controller selection and locking, so other connected controllers do not trigger mappings
+- Menu bar item for checking status, reopening JoyBridge, rescanning controllers, checking Accessibility permission, and quitting the app
 - Controller status, latest pressed button, and editable mapping list in the UI
 
 ## Supported Controller Inputs
@@ -96,10 +97,14 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 9. Change a mapping in the list and confirm the new action works. Set the Key picker to `None/无` when you want a modifier-only binding such as `Control`.
 10. Hold a controller button and confirm it does not continuously repeat.
 11. Release and press again to confirm it fires once more.
+12. Close the main JoyBridge window and confirm JoyBridge remains in the menu bar.
+13. Use the JoyBridge menu bar item to check status, reopen the window, rescan controllers, check Accessibility permission, or quit the app.
 
 After a target controller is locked, JoyBridge should only respond to that saved controller. If the target controller is not connected, JoyBridge should not automatically switch to another Bluetooth controller.
 
 For Joy-Con testing, connecting both left and right Joy-Cons at the same time is recommended. Confirm the Xcode console shows `Button pressed`, `Mapping found`, and `Keyboard event sent`. If `L/R/ZL/ZR` do not print `Button pressed` when only one Joy-Con is connected, macOS is not exposing those physical buttons through `GameController.framework` for that single-controller mode.
+
+Menu bar note: menu bar mode only keeps JoyBridge running after the main window is closed. It does not start JoyBridge automatically after a Mac restart yet. Open JoyBridge manually after restart, then quit it from the menu bar item when you are done testing.
 
 ## Current MVP Scope
 
@@ -169,9 +174,9 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 ## 当前测试版本
 
-最新共享测试版本：`v0.3.0` / `2026-05-10`
+最新共享测试版本：`v0.4.0` / `2026-05-10`
 
-这个版本新增了目标控制器锁定功能，让 JoyBridge 只监听你选择的控制器，避免响应其他蓝牙手柄。同时保留之前测试版里的 Joy-Con 连接方式说明。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+这个版本新增了简单的菜单栏常驻模式。关闭主窗口后 JoyBridge 不会退出，可以通过菜单栏重新打开窗口、重新检测控制器或退出 App。同时保留之前测试版里的目标控制器锁定和 Joy-Con 连接方式说明。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
 
 ## MVP 功能
 
@@ -183,6 +188,7 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 - 支持单键、纯修饰键映射和组合键，例如 `Command + C`、`Command + Shift + S`
 - 防止长按按钮时无限重复触发
 - 支持选择并锁定目标控制器，避免其他已连接手柄触发映射
+- 支持菜单栏入口，用于查看状态、重新打开 JoyBridge、重新检测控制器、检测辅助功能权限和退出 App
 - 界面显示控制器状态、最近按下按钮和可编辑映射列表
 
 ## 支持的手柄按钮
@@ -259,10 +265,14 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 9. 修改映射列表中的按键，确认新的映射生效。需要纯修饰键映射时，可以把 Key 选择器设为 `None/无`，例如只触发 `Control`。
 10. 长按手柄按钮，确认不会连续疯狂触发。
 11. 松开后再次按下，确认可以再次触发。
+12. 关闭 JoyBridge 主窗口，确认 App 仍然留在菜单栏中。
+13. 使用菜单栏里的 JoyBridge 查看状态、重新打开窗口、重新检测控制器、检测辅助功能权限或退出 App。
 
 锁定目标控制器后，JoyBridge 应该只响应这个已保存的控制器。如果目标控制器没有连接，JoyBridge 不应该自动切换到其他蓝牙手柄。
 
 测试 Joy-Con 时，建议同时连接左右两个 Joy-Con。请以 Xcode 控制台中的 `Button pressed`、`Mapping found`、`Keyboard event sent` 为准。如果只连接单只 Joy-Con 时按 `L/R/ZL/ZR` 没有出现 `Button pressed`，说明 macOS 当前没有通过 `GameController.framework` 暴露这些实体按键。
+
+菜单栏说明：菜单栏模式只表示关闭主窗口后 JoyBridge 继续运行。它还不会在 Mac 重启后自动启动。重启后仍需要手动打开 JoyBridge；测试结束时请从菜单栏里的 JoyBridge 选择退出。
 
 ## 当前 MVP 范围
 
@@ -315,7 +325,6 @@ JoyBridge/
 
 ## 后续方向
 
-- 菜单栏常驻模式
 - 映射 JSON 导入/导出
 - 多配置文件
 - 更完善的控制器型号诊断

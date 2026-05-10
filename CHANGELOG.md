@@ -1,5 +1,63 @@
 # Changelog
 
+## v0.4.0 - 2026-05-10
+
+### English
+
+This update adds the first menu bar mode for daily testing.
+
+Changed:
+
+- Added a JoyBridge menu bar item.
+- Closing the main window no longer quits JoyBridge.
+- The menu bar item can reopen the JoyBridge window.
+- The menu bar item can rescan controllers.
+- The menu bar item shows controller and Accessibility permission status.
+- The menu bar item can request/check Accessibility permission.
+- The menu bar item can fully quit JoyBridge.
+- Quitting JoyBridge now releases any held modifier-only mappings before termination.
+- Added in-app and README notes explaining that this is not login-item autostart yet.
+
+Validation:
+
+- Built successfully with Xcode/macOS Debug target.
+- Kept the existing target controller locking and mapping logic unchanged.
+
+Known limitations:
+
+- JoyBridge still does not launch automatically after a Mac restart. Open it manually, then use the menu bar item while testing.
+- This is still an Xcode-run test build, not a packaged `.dmg`.
+- Target controller locking still may not distinguish two completely identical controllers across launches.
+- If repeated menu bar reopening ever creates duplicate windows during testing, that should be tightened in the next AppKit window-management pass.
+
+### 中文
+
+本次更新新增第一版菜单栏常驻模式，方便日常测试。
+
+本次更新：
+
+- 新增 JoyBridge 菜单栏入口。
+- 关闭主窗口后 JoyBridge 不再退出。
+- 可以从菜单栏重新打开 JoyBridge 窗口。
+- 可以从菜单栏重新检测控制器。
+- 菜单栏会显示控制器和辅助功能权限状态。
+- 可以从菜单栏请求/重新检测辅助功能权限。
+- 可以从菜单栏完全退出 JoyBridge。
+- 退出 JoyBridge 前会释放已经按住的纯修饰键映射，降低修饰键卡住的风险。
+- 在 App 和 README 中补充说明：这还不是开机自启。
+
+验证结果：
+
+- Xcode/macOS Debug 目标构建成功。
+- 保持现有目标控制器锁定和映射逻辑不变。
+
+已知限制：
+
+- JoyBridge 还不会在 Mac 重启后自动启动。重启后仍需要手动打开，然后在测试过程中使用菜单栏入口。
+- 当前仍然是 Xcode 运行的测试版，还不是打包好的 `.dmg`。
+- 目标控制器锁定仍可能无法在跨启动后精确区分两只完全相同型号的控制器。
+- 如果后续测试发现反复从菜单栏打开会产生重复窗口，下一轮再收紧 AppKit 窗口管理。
+
 ## v0.3.0 - 2026-05-10
 
 ### English

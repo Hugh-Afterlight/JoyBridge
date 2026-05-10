@@ -38,6 +38,7 @@ struct ContentView: View {
                 Text("4. 修改映射")
                 Text("5. 按下手柄按钮测试")
                 Text("6. 建议同时连接左右 Joy-Con；单只 Joy-Con 的 L/R/ZL/ZR 可能受 macOS GameController 限制")
+                Text("7. 关闭主窗口后，JoyBridge 会继续在菜单栏运行；需要完全退出时请使用菜单栏里的“退出 JoyBridge”")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 4)
