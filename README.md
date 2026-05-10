@@ -6,9 +6,9 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 
 ## Current Test Version
 
-Latest shared test version: `v0.2.0` / `2026-05-10`
+Latest shared test version: `v0.2.1` / `2026-05-10`
 
-This version adds modifier-only mappings, improves Joy-Con input handling, and includes a dedicated correction for single left Joy-Con direction buttons. Friend testing found that single Joy-Con shoulder/trigger buttons may not be exposed by Apple's `GameController.framework`. See [CHANGELOG.md](CHANGELOG.md) for details.
+This version adds modifier-only mappings, improves Joy-Con input handling, includes a dedicated correction for single left Joy-Con direction buttons, and documents the confirmed single Joy-Con shoulder/trigger limitation. See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## MVP Features
 
@@ -165,9 +165,9 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 ## 当前测试版本
 
-最新共享测试版本：`v0.2.0` / `2026-05-10`
+最新共享测试版本：`v0.2.1` / `2026-05-10`
 
-这个版本新增了纯修饰键映射，改进了 Joy-Con 输入识别，并针对单只左 Joy-Con 的方向键做了专用校正。朋友测试发现，单只 Joy-Con 的肩键/扳机键可能不会被 Apple 的 `GameController.framework` 暴露出来。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+这个版本新增了纯修饰键映射，改进了 Joy-Con 输入识别，针对单只左 Joy-Con 的方向键做了专用校正，并记录了已确认的单只 Joy-Con 肩键/扳机键限制。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
 
 ## MVP 功能
 

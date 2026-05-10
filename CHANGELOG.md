@@ -1,5 +1,55 @@
 # Changelog
 
+## v0.2.1 - 2026-05-10
+
+### English
+
+This is a focused friend-test update based on single Joy-Con testing.
+
+Changed:
+
+- Added a safer physical input polling fallback for shoulder/trigger diagnostics without polling DPad buttons, avoiding duplicate direction-key triggers during Joy-Con testing.
+- Added an in-app tester note that single Joy-Con `L/R/ZL/ZR` may be limited by macOS `GameController.framework`.
+- Updated the README and changelog with the confirmed single Joy-Con support status.
+
+Validation:
+
+- Built successfully with Xcode/macOS Debug target.
+- Manually tested single `Joy-Con (L)` and single `Joy-Con (R)` with friend-test logs:
+  - `Joy-Con (L)` direction buttons work after correction.
+  - `Joy-Con (R)` `A/B/X/Y` buttons work.
+  - Single Joy-Con `L/R/ZL/ZR` did not report value changes through `GameController.framework`.
+
+Known limitations:
+
+- Single Joy-Con shoulder/trigger buttons (`L/R/ZL/ZR`) may not be mappable in the current GameController-based MVP because macOS does not always expose their press states for separately paired Joy-Cons.
+- Switch Pro Controller and compatible full controllers still need separate validation for shoulder/trigger buttons.
+- No packaged `.dmg` release yet. Friends still need to run the project from Xcode.
+
+### 中文
+
+这是基于单只 Joy-Con 实测结果整理的小版本更新。
+
+本次更新：
+
+- 新增更安全的物理输入轮询兜底，只用于肩键/扳机键诊断，不再轮询 DPad，避免 Joy-Con 测试时方向键被重复触发。
+- 在 App 调试提示中注明：单只 Joy-Con 的 `L/R/ZL/ZR` 可能受 macOS `GameController.framework` 限制。
+- 更新 README 和 CHANGELOG，明确写出当前单只 Joy-Con 的实测支持情况。
+
+验证结果：
+
+- Xcode/macOS Debug 目标构建成功。
+- 根据朋友测试日志手动确认：
+  - `Joy-Con (L)` 方向键校正后可用。
+  - `Joy-Con (R)` 的 `A/B/X/Y` 可用。
+  - 单只 Joy-Con 的 `L/R/ZL/ZR` 没有通过 `GameController.framework` 上报数值变化。
+
+已知限制：
+
+- 单只 Joy-Con 的肩键/扳机键（`L/R/ZL/ZR`）在当前基于 GameController 的 MVP 中可能无法映射，因为 macOS 不一定会暴露单独配对 Joy-Con 的这些按键状态。
+- Switch Pro Controller 和兼容完整手柄的肩键/扳机键还需要单独验证。
+- 暂时没有打包 `.dmg`，朋友仍然需要用 Xcode 运行项目。
+
 ## v0.2.0 - 2026-05-10
 
 ### English
@@ -29,24 +79,18 @@ Changed:
   - `Button A -> DPad Left`
 - Improved logs for controller profiles, button values, DPad axes, mapping lookup, modifier holds, and keyboard event sending.
 - Updated the README with modifier-only mapping instructions and troubleshooting notes.
-- Added a safer physical input polling fallback for shoulder/trigger diagnostics without polling DPad buttons, avoiding duplicate direction-key triggers during Joy-Con testing.
 
 Validation:
 
 - Built successfully with Xcode/macOS Debug target.
 - Manually tested Accessibility permission detection.
 - Manually tested Joy-Con (L) direction input correction during local development.
-- Manually tested single `Joy-Con (L)` and single `Joy-Con (R)` with friend-test logs:
-  - `Joy-Con (L)` direction buttons work after correction.
-  - `Joy-Con (R)` `A/B/X/Y` buttons work.
-  - Single Joy-Con `L/R/ZL/ZR` did not report value changes through `GameController.framework`.
 
 Known limitations:
 
 - No packaged `.dmg` release yet.
 - Friends still need to open the project in Xcode, select their own Team, run the app, and grant Accessibility permission.
 - No menu bar mode or login item support yet, so the app must be opened manually after restart.
-- Single Joy-Con shoulder/trigger buttons (`L/R/ZL/ZR`) may not be mappable in the current GameController-based MVP because macOS does not always expose their press states for separately paired Joy-Cons.
 
 ### 中文
 
@@ -75,21 +119,15 @@ Known limitations:
   - `Button A -> DPad Left`
 - 改进日志输出，包含控制器 profile、按钮值、DPad 轴向、映射查找、修饰键保持和键盘事件发送。
 - 更新 README，补充纯修饰键映射和排错说明。
-- 新增更安全的物理输入轮询兜底，只用于肩键/扳机键诊断，不再轮询 DPad，避免 Joy-Con 测试时方向键被重复触发。
 
 验证结果：
 
 - Xcode/macOS Debug 目标构建成功。
 - 本地手动测试了 Accessibility 权限检测。
 - 本地开发过程中手动测试了 `Joy-Con (L)` 方向键校正。
-- 根据朋友测试日志手动确认：
-  - `Joy-Con (L)` 方向键校正后可用。
-  - `Joy-Con (R)` 的 `A/B/X/Y` 可用。
-  - 单只 Joy-Con 的 `L/R/ZL/ZR` 没有通过 `GameController.framework` 上报数值变化。
 
 已知限制：
 
 - 暂时没有打包 `.dmg`。
 - 朋友仍然需要用 Xcode 打开项目，选择自己的 Team，运行 App，并授权 Accessibility 辅助功能权限。
 - 暂时没有菜单栏常驻和开机自启，重启电脑后需要手动打开 App。
-- 单只 Joy-Con 的肩键/扳机键（`L/R/ZL/ZR`）在当前基于 GameController 的 MVP 中可能无法映射，因为 macOS 不一定会暴露单独配对 Joy-Con 的这些按键状态。
