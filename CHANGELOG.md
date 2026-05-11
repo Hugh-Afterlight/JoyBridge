@@ -1,5 +1,67 @@
 # Changelog
 
+## v0.5.0 - 2026-05-11
+
+### English
+
+This update adds a repeatable local packaging workflow for friend-test builds.
+
+Changed:
+
+- Added `Scripts/package-local-release.sh`.
+- Added `dist/` to `.gitignore` so generated packages are not committed.
+- The script builds the macOS Release app with Xcode.
+- The script stages `JoyBridge.app`, `README.md`, `CHANGELOG.md`, and a `READ-ME-FIRST.txt` tester note.
+- The script creates `dist/JoyBridge-v0.5.0-local-test.zip`.
+- The script prints code-signing and Gatekeeper assessment information for easier debugging.
+- Updated README with local package creation steps and friend-test warnings.
+
+Validation:
+
+- Built and packaged successfully with the local packaging script.
+- Kept app runtime behavior unchanged.
+
+Known limitations:
+
+- The generated package is for local friend testing only.
+- It is signed with Apple Development for testing, not Developer ID for public distribution.
+- It is not notarized by Apple yet, so macOS may show a security warning after download.
+- Friends may need to right-click JoyBridge and choose Open, or approve it in System Settings > Privacy & Security.
+- Recommended install order is: unzip, move `JoyBridge.app` to `/Applications`, open it, then grant Accessibility permission.
+- Accessibility permission must be granted to the installed copy of JoyBridge, not only the previous Xcode build path.
+- `spctl` may report `rejected` or an internal code-signing error for this local package. That is expected for this non-notarized test package and means it is not a public release.
+- This update does not add login-item autostart.
+
+### 中文
+
+本次更新新增可重复执行的本地打包流程，方便生成朋友测试包。
+
+本次更新：
+
+- 新增 `Scripts/package-local-release.sh`。
+- 在 `.gitignore` 中加入 `dist/`，避免把生成的测试包提交进仓库。
+- 脚本会用 Xcode 构建 macOS Release 版本。
+- 脚本会整理 `JoyBridge.app`、`README.md`、`CHANGELOG.md` 和 `READ-ME-FIRST.txt` 测试说明。
+- 脚本会生成 `dist/JoyBridge-v0.5.0-local-test.zip`。
+- 脚本会输出代码签名和 Gatekeeper 检查信息，方便排查打开失败的问题。
+- 更新 README，加入本地测试包生成步骤和朋友测试注意事项。
+
+验证结果：
+
+- 已通过本地打包脚本成功构建并生成测试包。
+- 没有修改 App 运行时逻辑。
+
+已知限制：
+
+- 生成的包只适合本地朋友测试。
+- 它使用 Apple Development 测试签名，不是用于公开分发的 Developer ID 签名。
+- 它还没有经过 Apple 公证，所以下载后 macOS 可能会显示安全提醒。
+- 朋友可能需要右键点击 JoyBridge 后选择打开，或在 系统设置 > 隐私与安全性 中手动允许。
+- 建议安装顺序是：解压、把 `JoyBridge.app` 移到“应用程序”、打开 App、再授权辅助功能权限。
+- 辅助功能权限必须授权给安装后的 JoyBridge，而不只是以前的 Xcode 构建路径。
+- `spctl` 可能会对这个本地测试包显示 `rejected` 或代码签名内部错误。这对未公证测试包来说是预期限制，也表示它不是公开发行版。
+- 本次更新不包含开机自启。
+
 ## v0.4.0 - 2026-05-10
 
 ### English

@@ -6,9 +6,9 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 
 ## Current Test Version
 
-Latest shared test version: `v0.4.0` / `2026-05-10`
+Latest shared test version: `v0.5.0` / `2026-05-11`
 
-This version adds a simple menu bar mode. Closing the main window no longer quits JoyBridge, and the menu bar item can reopen the window, rescan controllers, or quit the app. It also keeps target controller locking and the Joy-Con pairing notes from previous test builds. See [CHANGELOG.md](CHANGELOG.md) for details.
+This version adds a local packaging script for friend-test builds. It can create a Release build and package JoyBridge as a local `.zip` artifact under `dist/`. This is still not a notarized public release. See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## MVP Features
 
@@ -21,6 +21,7 @@ This version adds a simple menu bar mode. Closing the main window no longer quit
 - Debounced controller input so holding a button does not repeatedly fire
 - Target controller selection and locking, so other connected controllers do not trigger mappings
 - Menu bar item for checking status, reopening JoyBridge, rescanning controllers, checking Accessibility permission, and quitting the app
+- Local packaging script for creating friend-test `.zip` builds
 - Controller status, latest pressed button, and editable mapping list in the UI
 
 ## Supported Controller Inputs
@@ -83,6 +84,31 @@ If macOS still reports that Accessibility is missing after you grant permission,
 ```sh
 tccutil reset Accessibility cc.afterlight.JoyBridge
 ```
+
+## Create a Local Test Package
+
+After the app works from Xcode, you can create a local friend-test package:
+
+```sh
+Scripts/package-local-release.sh v0.5.0
+```
+
+The script builds the Release app and writes the package to:
+
+```text
+dist/JoyBridge-v0.5.0-local-test.zip
+```
+
+Important notes:
+
+- This package is for local friend testing only.
+- It is signed with Apple Development for testing, not Developer ID for public distribution.
+- It is not notarized by Apple yet, so macOS may show a security warning when opening it after download.
+- Friends may need to right-click JoyBridge and choose Open, or approve it in System Settings > Privacy & Security.
+- Recommended order: unzip the package, move `JoyBridge.app` to `/Applications`, open it, then grant Accessibility permission.
+- Accessibility permission must be granted to the installed copy of JoyBridge. If an older Xcode build was authorized before, remove and re-add JoyBridge in Accessibility settings.
+- `spctl` may report `rejected` or an internal code-signing error for this local package. That means it is not a notarized public release.
+- The package is not committed to Git. `dist/` is ignored on purpose.
 
 ## Testing
 
@@ -153,16 +179,18 @@ JoyBridge/
     MappingRowView.swift
     PermissionStatusView.swift
     ControllerStatusView.swift
+
+Scripts/
+  package-local-release.sh
 ```
 
 ## Roadmap
 
-- Menu bar mode
 - JSON import/export for mappings
 - Multiple mapping profiles
 - Better controller model diagnostics
 - Universal build support
-- More polished release packaging
+- Notarized Developer ID release packaging
 
 ---
 
@@ -174,9 +202,9 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 ## 当前测试版本
 
-最新共享测试版本：`v0.4.0` / `2026-05-10`
+最新共享测试版本：`v0.5.0` / `2026-05-11`
 
-这个版本新增了简单的菜单栏常驻模式。关闭主窗口后 JoyBridge 不会退出，可以通过菜单栏重新打开窗口、重新检测控制器或退出 App。同时保留之前测试版里的目标控制器锁定和 Joy-Con 连接方式说明。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+这个版本新增了本地测试包脚本，可以构建 Release 版本，并在 `dist/` 下生成给朋友测试的 `.zip` 包。它还不是经过 Apple 公证的正式公开发行版。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
 
 ## MVP 功能
 
@@ -189,6 +217,7 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 - 防止长按按钮时无限重复触发
 - 支持选择并锁定目标控制器，避免其他已连接手柄触发映射
 - 支持菜单栏入口，用于查看状态、重新打开 JoyBridge、重新检测控制器、检测辅助功能权限和退出 App
+- 支持本地打包脚本，用于生成朋友测试版 `.zip`
 - 界面显示控制器状态、最近按下按钮和可编辑映射列表
 
 ## 支持的手柄按钮
@@ -251,6 +280,31 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 ```sh
 tccutil reset Accessibility cc.afterlight.JoyBridge
 ```
+
+## 生成本地测试包
+
+确认 App 可以从 Xcode 正常运行后，可以生成一个给朋友测试的本地包：
+
+```sh
+Scripts/package-local-release.sh v0.5.0
+```
+
+脚本会构建 Release 版本，并把测试包输出到：
+
+```text
+dist/JoyBridge-v0.5.0-local-test.zip
+```
+
+重要提醒：
+
+- 这个包只适合本地朋友测试。
+- 它使用 Apple Development 测试签名，不是用于公开分发的 Developer ID 签名。
+- 它还没有经过 Apple 公证，所以下载后打开时 macOS 可能会显示安全提醒。
+- 朋友可能需要右键点击 JoyBridge 后选择打开，或在 系统设置 > 隐私与安全性 中手动允许。
+- 建议顺序：先解压测试包，把 `JoyBridge.app` 移到“应用程序”，再打开，再授权辅助功能权限。
+- 必须给安装后的这个 JoyBridge 授权辅助功能权限。如果以前授权的是 Xcode 构建版本，需要在辅助功能设置里移除并重新添加 JoyBridge。
+- `spctl` 可能会对这个本地测试包显示 `rejected` 或代码签名内部错误。这表示它还不是经过 Apple 公证的正式公开发行版。
+- 测试包不会提交到 Git。`dist/` 会被故意忽略。
 
 ## 测试方法
 
@@ -321,6 +375,9 @@ JoyBridge/
     MappingRowView.swift
     PermissionStatusView.swift
     ControllerStatusView.swift
+
+Scripts/
+  package-local-release.sh
 ```
 
 ## 后续方向
@@ -329,4 +386,4 @@ JoyBridge/
 - 多配置文件
 - 更完善的控制器型号诊断
 - Universal 构建
-- 更完整的发布打包流程
+- 经过 Apple 公证的 Developer ID 正式发布包
