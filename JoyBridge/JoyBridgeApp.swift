@@ -49,11 +49,23 @@ private struct JoyBridgeMenuBarView: View {
 
     var body: some View {
         Text("监听状态：\(controllerManager.isControllerConnected ? "运行中" : "等待控制器")")
+        Text("映射状态：\(mappingManager.isMappingPaused ? "已暂停" : "已启用")")
         Text("当前控制器：\(controllerManager.connectedControllerName ?? "未连接")")
         Text("辅助功能：\(accessibilityPermissionManager.isTrusted ? "已授权" : "未授权")")
 
         if let latestPressedButton = controllerManager.latestPressedButton {
             Text("最近按键：\(latestPressedButton.displayName)")
+        }
+
+        Divider()
+
+        Button {
+            mappingManager.toggleMappingPaused()
+        } label: {
+            Label(
+                mappingManager.isMappingPaused ? "启用映射" : "暂停映射",
+                systemImage: mappingManager.isMappingPaused ? "play.circle" : "pause.circle"
+            )
         }
 
         Divider()

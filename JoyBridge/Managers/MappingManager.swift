@@ -4,8 +4,10 @@ import Foundation
 @MainActor
 final class MappingManager: ObservableObject {
     @Published private(set) var mappings: [KeyMapping] = []
+    @Published private(set) var isMappingPaused: Bool
 
     private let userDefaultsKey = "joybridge.keyMappings"
+    private let mappingPausedDefaultsKey = "joybridge.mappingPaused"
     private let userDefaults: UserDefaults
     private let keyboardEventSender: KeyboardEventSender
     private let accessibilityPermissionManager: AccessibilityPermissionManager
@@ -19,7 +21,9 @@ final class MappingManager: ObservableObject {
         self.accessibilityPermissionManager = accessibilityPermissionManager
         self.userDefaults = userDefaults
         self.keyboardEventSender = keyboardEventSender ?? KeyboardEventSender()
+        isMappingPaused = userDefaults.bool(forKey: mappingPausedDefaultsKey)
 
+        print("Global mapping pause state loaded: \(isMappingPaused ? "paused" : "enabled")")
         loadMappings()
     }
 
@@ -44,6 +48,11 @@ final class MappingManager: ObservableObject {
     }
 
     func handleButtonPress(_ button: ControllerButton) {
+        guard !isMappingPaused else {
+            print("Mapping skipped because global pause is enabled: \(button.displayName)")
+            return
+        }
+
         guard let mapping = mapping(for: button) else {
             print("Mapping missing: \(button.displayName)")
             return
@@ -65,6 +74,26 @@ final class MappingManager: ObservableObject {
 
     func handleButtonRelease(_ button: ControllerButton) {
         releaseModifierHold(for: button)
+    }
+
+    func setMappingPaused(_ isPaused: Bool) {
+        guard isMappingPaused != isPaused else {
+            return
+        }
+
+        isMappingPaused = isPaused
+        userDefaults.set(isPaused, forKey: mappingPausedDefaultsKey)
+
+        if isPaused {
+            releaseAllHeldModifiers()
+            print("Mappings paused; held modifiers released")
+        } else {
+            print("Mappings enabled")
+        }
+    }
+
+    func toggleMappingPaused() {
+        setMappingPaused(!isMappingPaused)
     }
 
     func releaseAllHeldModifiers() {

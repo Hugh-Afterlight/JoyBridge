@@ -1,5 +1,59 @@
 # Changelog
 
+## v0.6.0 - 2026-05-11
+
+### English
+
+This update adds a global pause/resume switch for safer daily use while JoyBridge is running in the menu bar.
+
+Changed:
+
+- Added a persisted global mapping pause state stored in `UserDefaults`.
+- Added a mapping status section in the main window.
+- Added `暂停映射` / `启用映射` controls in the main window and menu bar.
+- When mappings are paused, JoyBridge still detects controller input and updates the latest pressed button, but it does not send keyboard events.
+- Pausing mappings releases any held modifier-only mappings immediately to reduce stuck modifier risk.
+- Added logs for paused mapping attempts, pausing, and resuming.
+- Updated README testing steps and package notes.
+
+Validation:
+
+- Built successfully with Xcode/macOS Debug target.
+- Rebuilt the local test package with `Scripts/package-local-release.sh v0.6.0`.
+- Verified the zip includes `JoyBridge.app`, `README.md`, `CHANGELOG.md`, and `READ-ME-FIRST.txt`.
+
+Known limitations:
+
+- This is still a local friend-test package, not a notarized public release.
+- The pause state is restored on next launch. If mappings do not fire after restarting, check whether JoyBridge is paused.
+- Pause/resume does not disconnect or stop controller monitoring; it only stops keyboard output.
+
+### 中文
+
+本次更新新增全局暂停/启用映射开关，让 JoyBridge 在菜单栏常驻时更适合日常使用。
+
+本次更新：
+
+- 新增全局映射暂停状态，并使用 `UserDefaults` 保存。
+- 主窗口新增映射状态区域。
+- 主窗口和菜单栏都新增 `暂停映射` / `启用映射` 控制。
+- 暂停映射时，JoyBridge 仍会识别手柄输入并更新最近按键，但不会发送键盘事件。
+- 暂停映射时会立即释放已经按住的纯修饰键映射，降低修饰键卡住风险。
+- 新增暂停、恢复、暂停期间按键的日志。
+- 更新 README 测试步骤和测试包说明。
+
+验证结果：
+
+- Xcode/macOS Debug 目标构建成功。
+- 已用 `Scripts/package-local-release.sh v0.6.0` 重新生成本地测试包。
+- 确认 zip 内包含 `JoyBridge.app`、`README.md`、`CHANGELOG.md` 和 `READ-ME-FIRST.txt`。
+
+已知限制：
+
+- 这仍然是本地朋友测试包，不是经过 Apple 公证的正式公开发行版。
+- 暂停状态会在下次启动时恢复。如果重启后映射没有触发，请先检查 JoyBridge 是否处于暂停状态。
+- 暂停/启用不会断开或停止控制器监听，只会停止键盘输出。
+
 ## v0.5.1 - 2026-05-11
 
 ### English

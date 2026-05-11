@@ -6,9 +6,9 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 
 ## Current Test Version
 
-Latest shared test version: `v0.5.1` / `2026-05-11`
+Latest shared test version: `v0.6.0` / `2026-05-11`
 
-This version improves the local friend-test package instructions for macOS Gatekeeper first-open warnings. This is still not a notarized public release. See [CHANGELOG.md](CHANGELOG.md) for details.
+This version adds a global pause/resume switch for controller mappings, available in both the main window and the menu bar. This is still not a notarized public release. See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## MVP Features
 
@@ -21,6 +21,7 @@ This version improves the local friend-test package instructions for macOS Gatek
 - Debounced controller input so holding a button does not repeatedly fire
 - Target controller selection and locking, so other connected controllers do not trigger mappings
 - Menu bar item for checking status, reopening JoyBridge, rescanning controllers, checking Accessibility permission, and quitting the app
+- Global pause/resume switch for temporarily disabling all keyboard output
 - Local packaging script for creating friend-test `.zip` builds
 - Controller status, latest pressed button, and editable mapping list in the UI
 
@@ -90,13 +91,13 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 After the app works from Xcode, you can create a local friend-test package:
 
 ```sh
-Scripts/package-local-release.sh v0.5.1
+Scripts/package-local-release.sh v0.6.0
 ```
 
 The script builds the Release app and writes the package to:
 
 ```text
-dist/JoyBridge-v0.5.1-local-test.zip
+dist/JoyBridge-v0.6.0-local-test.zip
 ```
 
 Important notes:
@@ -147,13 +148,17 @@ Only use this fallback for a JoyBridge build you trust. It removes macOS's downl
 10. Hold a controller button and confirm it does not continuously repeat.
 11. Release and press again to confirm it fires once more.
 12. Close the main JoyBridge window and confirm JoyBridge remains in the menu bar.
-13. Use the JoyBridge menu bar item to check status, reopen the window, rescan controllers, check Accessibility permission, or quit the app.
+13. Use the JoyBridge menu bar item to pause/resume mappings, check status, reopen the window, rescan controllers, check Accessibility permission, or quit the app.
+14. Click `暂停映射`, press controller buttons, and confirm `最近按键` still updates but no keyboard input is sent.
+15. Click `启用映射` and confirm mappings work again.
 
 After a target controller is locked, JoyBridge should only respond to that saved controller. If the target controller is not connected, JoyBridge should not automatically switch to another Bluetooth controller.
 
 For Joy-Con testing, connecting both left and right Joy-Cons at the same time is recommended. Confirm the Xcode console shows `Button pressed`, `Mapping found`, and `Keyboard event sent`. If `L/R/ZL/ZR` do not print `Button pressed` when only one Joy-Con is connected, macOS is not exposing those physical buttons through `GameController.framework` for that single-controller mode.
 
 Menu bar note: menu bar mode only keeps JoyBridge running after the main window is closed. It does not start JoyBridge automatically after a Mac restart yet. Open JoyBridge manually after restart, then quit it from the menu bar item when you are done testing.
+
+Pause note: pausing mappings only stops keyboard output. Controller detection, latest pressed button display, and target controller locking continue to work. The pause state is saved and restored on next launch.
 
 ## Current MVP Scope
 
@@ -225,9 +230,9 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 ## 当前测试版本
 
-最新共享测试版本：`v0.5.1` / `2026-05-11`
+最新共享测试版本：`v0.6.0` / `2026-05-11`
 
-这个版本改进了本地朋友测试包在 macOS Gatekeeper 首次打开被拦截时的处理说明。它还不是经过 Apple 公证的正式公开发行版。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+这个版本新增全局暂停/启用映射开关，可以在主窗口和菜单栏里临时停止所有键盘输出。它还不是经过 Apple 公证的正式公开发行版。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
 
 ## MVP 功能
 
@@ -240,6 +245,7 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 - 防止长按按钮时无限重复触发
 - 支持选择并锁定目标控制器，避免其他已连接手柄触发映射
 - 支持菜单栏入口，用于查看状态、重新打开 JoyBridge、重新检测控制器、检测辅助功能权限和退出 App
+- 支持全局暂停/启用映射，用于临时停止所有键盘输出
 - 支持本地打包脚本，用于生成朋友测试版 `.zip`
 - 界面显示控制器状态、最近按下按钮和可编辑映射列表
 
@@ -309,13 +315,13 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 确认 App 可以从 Xcode 正常运行后，可以生成一个给朋友测试的本地包：
 
 ```sh
-Scripts/package-local-release.sh v0.5.1
+Scripts/package-local-release.sh v0.6.0
 ```
 
 脚本会构建 Release 版本，并把测试包输出到：
 
 ```text
-dist/JoyBridge-v0.5.1-local-test.zip
+dist/JoyBridge-v0.6.0-local-test.zip
 ```
 
 重要提醒：
@@ -366,13 +372,17 @@ xattr -dr com.apple.quarantine /Applications/JoyBridge.app
 10. 长按手柄按钮，确认不会连续疯狂触发。
 11. 松开后再次按下，确认可以再次触发。
 12. 关闭 JoyBridge 主窗口，确认 App 仍然留在菜单栏中。
-13. 使用菜单栏里的 JoyBridge 查看状态、重新打开窗口、重新检测控制器、检测辅助功能权限或退出 App。
+13. 使用菜单栏里的 JoyBridge 暂停/启用映射、查看状态、重新打开窗口、重新检测控制器、检测辅助功能权限或退出 App。
+14. 点击 `暂停映射`，按手柄按钮，确认 `最近按键` 仍会更新，但不会发送键盘输入。
+15. 点击 `启用映射`，确认映射重新生效。
 
 锁定目标控制器后，JoyBridge 应该只响应这个已保存的控制器。如果目标控制器没有连接，JoyBridge 不应该自动切换到其他蓝牙手柄。
 
 测试 Joy-Con 时，建议同时连接左右两个 Joy-Con。请以 Xcode 控制台中的 `Button pressed`、`Mapping found`、`Keyboard event sent` 为准。如果只连接单只 Joy-Con 时按 `L/R/ZL/ZR` 没有出现 `Button pressed`，说明 macOS 当前没有通过 `GameController.framework` 暴露这些实体按键。
 
 菜单栏说明：菜单栏模式只表示关闭主窗口后 JoyBridge 继续运行。它还不会在 Mac 重启后自动启动。重启后仍需要手动打开 JoyBridge；测试结束时请从菜单栏里的 JoyBridge 选择退出。
+
+暂停说明：暂停映射只会停止键盘输出。控制器检测、最近按键显示和目标控制器锁定仍会继续工作。暂停状态会保存，并在下次启动时恢复。
 
 ## 当前 MVP 范围
 
