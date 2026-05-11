@@ -11,7 +11,11 @@ struct ContentView: View {
             VStack(alignment: .leading, spacing: 18) {
                 Text("JoyBridge MVP")
                     .font(.largeTitle.bold())
+                Text("\(AppInfo.currentTestVersion) · \(AppInfo.releaseDate)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
 
+                ReadinessStatusView()
                 PermissionStatusView()
                 mappingStatusView
                 ControllerStatusView()

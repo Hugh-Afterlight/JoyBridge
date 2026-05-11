@@ -6,9 +6,9 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 
 ## Current Test Version
 
-Latest shared test version: `v0.6.0` / `2026-05-11`
+Latest shared test version: `v0.7.0` / `2026-05-11`
 
-This version adds a global pause/resume switch for controller mappings, available in both the main window and the menu bar. This is still not a notarized public release. See [CHANGELOG.md](CHANGELOG.md) for details.
+This version adds an in-app readiness check panel, visible version information, clearer menu bar status, and a copyable diagnostic summary for friend testing. This is still not a notarized public release. See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## MVP Features
 
@@ -22,7 +22,10 @@ This version adds a global pause/resume switch for controller mappings, availabl
 - Target controller selection and locking, so other connected controllers do not trigger mappings
 - Menu bar item for checking status, reopening JoyBridge, rescanning controllers, checking Accessibility permission, and quitting the app
 - Global pause/resume switch for temporarily disabling all keyboard output
+- Readiness check panel for Accessibility, controller connection, target lock, and mapping output status
+- Copyable diagnostic summary for easier friend-test feedback
 - Local packaging script for creating friend-test `.zip` builds
+- Package source summary with git commit, tag, and clean/dirty status in `READ-ME-FIRST.txt`
 - Controller status, latest pressed button, and editable mapping list in the UI
 
 ## Supported Controller Inputs
@@ -91,13 +94,13 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 After the app works from Xcode, you can create a local friend-test package:
 
 ```sh
-Scripts/package-local-release.sh v0.6.0
+Scripts/package-local-release.sh v0.7.0
 ```
 
 The script builds the Release app and writes the package to:
 
 ```text
-dist/JoyBridge-v0.6.0-local-test.zip
+dist/JoyBridge-v0.7.0-local-test.zip
 ```
 
 Important notes:
@@ -109,6 +112,7 @@ Important notes:
 - Recommended order: unzip the package, move `JoyBridge.app` to `/Applications`, open it, then grant Accessibility permission.
 - Accessibility permission must be granted to the installed copy of JoyBridge. If an older Xcode build was authorized before, remove and re-add JoyBridge in Accessibility settings.
 - `spctl` may report `rejected` or an internal code-signing error for this local package. That means it is not a notarized public release.
+- `READ-ME-FIRST.txt` includes the git commit, tag, and whether the worktree was clean or dirty when packaged.
 - The package is not committed to Git. `dist/` is ignored on purpose.
 
 ### If macOS Blocks JoyBridge
@@ -138,19 +142,21 @@ Only use this fallback for a JoyBridge build you trust. It removes macOS's downl
 
 1. Pair a Joy-Con or Switch Pro Controller in macOS Bluetooth settings.
 2. Open JoyBridge and click `重新检测控制器`.
-3. Confirm that the controller name appears.
-4. Click `锁定当前` to save the current controller as the target controller.
-5. Press controller buttons and confirm `最近按键` updates.
-6. Open TextEdit or another text field.
-7. Press `A` to test Space.
-8. Select text and press `X` / `Y` to test copy and paste.
-9. Change a mapping in the list and confirm the new action works. Set the Key picker to `None/无` when you want a modifier-only binding such as `Control`.
-10. Hold a controller button and confirm it does not continuously repeat.
-11. Release and press again to confirm it fires once more.
-12. Close the main JoyBridge window and confirm JoyBridge remains in the menu bar.
-13. Use the JoyBridge menu bar item to pause/resume mappings, check status, reopen the window, rescan controllers, check Accessibility permission, or quit the app.
-14. Click `暂停映射`, press controller buttons, and confirm `最近按键` still updates but no keyboard input is sent.
-15. Click `启用映射` and confirm mappings work again.
+3. Confirm that the `运行检查` panel shows the current version and the next required step.
+4. Confirm that the controller name appears.
+5. Click `锁定当前` to save the current controller as the target controller.
+6. Press controller buttons and confirm `最近按键` updates.
+7. Open TextEdit or another text field.
+8. Press `A` to test Space.
+9. Select text and press `X` / `Y` to test copy and paste.
+10. Change a mapping in the list and confirm the new action works. Set the Key picker to `None/无` when you want a modifier-only binding such as `Control`.
+11. Hold a controller button and confirm it does not continuously repeat.
+12. Release and press again to confirm it fires once more.
+13. Close the main JoyBridge window and confirm JoyBridge remains in the menu bar.
+14. Use the JoyBridge menu bar item to pause/resume mappings, check status, reopen the window, rescan controllers, check Accessibility permission, or quit the app.
+15. Click `暂停映射`, press controller buttons, and confirm `最近按键` still updates but no keyboard input is sent.
+16. Click `启用映射` and confirm mappings work again.
+17. Click `复制诊断信息` and confirm a readable summary is copied for feedback.
 
 After a target controller is locked, JoyBridge should only respond to that saved controller. If the target controller is not connected, JoyBridge should not automatically switch to another Bluetooth controller.
 
@@ -230,9 +236,9 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 ## 当前测试版本
 
-最新共享测试版本：`v0.6.0` / `2026-05-11`
+最新共享测试版本：`v0.7.0` / `2026-05-11`
 
-这个版本新增全局暂停/启用映射开关，可以在主窗口和菜单栏里临时停止所有键盘输出。它还不是经过 Apple 公证的正式公开发行版。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+这个版本新增 App 内运行检查面板、可见版本信息、更清楚的菜单栏状态和可复制诊断信息，方便朋友测试时判断当前是否可用。它还不是经过 Apple 公证的正式公开发行版。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
 
 ## MVP 功能
 
@@ -246,7 +252,10 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 - 支持选择并锁定目标控制器，避免其他已连接手柄触发映射
 - 支持菜单栏入口，用于查看状态、重新打开 JoyBridge、重新检测控制器、检测辅助功能权限和退出 App
 - 支持全局暂停/启用映射，用于临时停止所有键盘输出
+- 支持运行检查面板，用于汇总辅助功能、控制器连接、目标锁定和映射输出状态
+- 支持复制诊断信息，方便朋友测试时反馈问题
 - 支持本地打包脚本，用于生成朋友测试版 `.zip`
+- 测试包内的 `READ-ME-FIRST.txt` 会显示打包时的 git commit、tag 和工作区 clean/dirty 状态
 - 界面显示控制器状态、最近按下按钮和可编辑映射列表
 
 ## 支持的手柄按钮
@@ -315,13 +324,13 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 确认 App 可以从 Xcode 正常运行后，可以生成一个给朋友测试的本地包：
 
 ```sh
-Scripts/package-local-release.sh v0.6.0
+Scripts/package-local-release.sh v0.7.0
 ```
 
 脚本会构建 Release 版本，并把测试包输出到：
 
 ```text
-dist/JoyBridge-v0.6.0-local-test.zip
+dist/JoyBridge-v0.7.0-local-test.zip
 ```
 
 重要提醒：
@@ -333,6 +342,7 @@ dist/JoyBridge-v0.6.0-local-test.zip
 - 建议顺序：先解压测试包，把 `JoyBridge.app` 移到“应用程序”，再打开，再授权辅助功能权限。
 - 必须给安装后的这个 JoyBridge 授权辅助功能权限。如果以前授权的是 Xcode 构建版本，需要在辅助功能设置里移除并重新添加 JoyBridge。
 - `spctl` 可能会对这个本地测试包显示 `rejected` 或代码签名内部错误。这表示它还不是经过 Apple 公证的正式公开发行版。
+- `READ-ME-FIRST.txt` 会显示打包时的 git commit、tag，以及工作区当时是 clean 还是 dirty。
 - 测试包不会提交到 Git。`dist/` 会被故意忽略。
 
 ### 如果 macOS 拦截 JoyBridge
@@ -362,19 +372,21 @@ xattr -dr com.apple.quarantine /Applications/JoyBridge.app
 
 1. 在 macOS 蓝牙设置中连接 Joy-Con 或 Switch Pro Controller。
 2. 打开 JoyBridge，点击 `重新检测控制器`。
-3. 确认界面显示控制器名称。
-4. 点击 `锁定当前`，把当前控制器保存为目标控制器。
-5. 按手柄按钮，确认 `最近按键` 更新。
-6. 打开 TextEdit 或其他输入框。
-7. 按 `A` 测试 Space。
-8. 选中文本后按 `X` / `Y` 测试复制和粘贴。
-9. 修改映射列表中的按键，确认新的映射生效。需要纯修饰键映射时，可以把 Key 选择器设为 `None/无`，例如只触发 `Control`。
-10. 长按手柄按钮，确认不会连续疯狂触发。
-11. 松开后再次按下，确认可以再次触发。
-12. 关闭 JoyBridge 主窗口，确认 App 仍然留在菜单栏中。
-13. 使用菜单栏里的 JoyBridge 暂停/启用映射、查看状态、重新打开窗口、重新检测控制器、检测辅助功能权限或退出 App。
-14. 点击 `暂停映射`，按手柄按钮，确认 `最近按键` 仍会更新，但不会发送键盘输入。
-15. 点击 `启用映射`，确认映射重新生效。
+3. 确认 `运行检查` 面板显示当前版本和下一步需要处理的状态。
+4. 确认界面显示控制器名称。
+5. 点击 `锁定当前`，把当前控制器保存为目标控制器。
+6. 按手柄按钮，确认 `最近按键` 更新。
+7. 打开 TextEdit 或其他输入框。
+8. 按 `A` 测试 Space。
+9. 选中文本后按 `X` / `Y` 测试复制和粘贴。
+10. 修改映射列表中的按键，确认新的映射生效。需要纯修饰键映射时，可以把 Key 选择器设为 `None/无`，例如只触发 `Control`。
+11. 长按手柄按钮，确认不会连续疯狂触发。
+12. 松开后再次按下，确认可以再次触发。
+13. 关闭 JoyBridge 主窗口，确认 App 仍然留在菜单栏中。
+14. 使用菜单栏里的 JoyBridge 暂停/启用映射、查看状态、重新打开窗口、重新检测控制器、检测辅助功能权限或退出 App。
+15. 点击 `暂停映射`，按手柄按钮，确认 `最近按键` 仍会更新，但不会发送键盘输入。
+16. 点击 `启用映射`，确认映射重新生效。
+17. 点击 `复制诊断信息`，确认可以复制一段可读的问题反馈摘要。
 
 锁定目标控制器后，JoyBridge 应该只响应这个已保存的控制器。如果目标控制器没有连接，JoyBridge 不应该自动切换到其他蓝牙手柄。
 

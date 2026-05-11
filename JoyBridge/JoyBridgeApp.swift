@@ -31,13 +31,43 @@ struct JoyBridgeApp: App {
         }
         .windowStyle(.titleBar)
 
-        MenuBarExtra("JoyBridge", systemImage: "gamecontroller") {
+        MenuBarExtra {
             JoyBridgeMenuBarView()
                 .environmentObject(accessibilityPermissionManager)
                 .environmentObject(mappingManager)
                 .environmentObject(controllerManager)
+        } label: {
+            Label(menuBarTitle, systemImage: menuBarSystemImage)
         }
         .menuBarExtraStyle(.menu)
+    }
+
+    private var menuBarTitle: String {
+        if !accessibilityPermissionManager.isTrusted {
+            return "JoyBridge 未授权"
+        }
+
+        if mappingManager.isMappingPaused {
+            return "JoyBridge 暂停"
+        }
+
+        if controllerManager.isControllerConnected {
+            return "JoyBridge 运行"
+        }
+
+        return "JoyBridge"
+    }
+
+    private var menuBarSystemImage: String {
+        if !accessibilityPermissionManager.isTrusted {
+            return "exclamationmark.triangle"
+        }
+
+        if mappingManager.isMappingPaused {
+            return "pause.circle"
+        }
+
+        return controllerManager.isControllerConnected ? "gamecontroller.fill" : "gamecontroller"
     }
 }
 
@@ -48,6 +78,7 @@ private struct JoyBridgeMenuBarView: View {
     @EnvironmentObject private var controllerManager: ControllerManager
 
     var body: some View {
+        Text("版本：\(AppInfo.currentTestVersion)")
         Text("监听状态：\(controllerManager.isControllerConnected ? "运行中" : "等待控制器")")
         Text("映射状态：\(mappingManager.isMappingPaused ? "已暂停" : "已启用")")
         Text("当前控制器：\(controllerManager.connectedControllerName ?? "未连接")")

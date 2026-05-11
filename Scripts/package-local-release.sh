@@ -17,10 +17,20 @@ APP_NAME="JoyBridge.app"
 APP_PATH="$DERIVED_DATA_DIR/Build/Products/$CONFIGURATION/$APP_NAME"
 PACKAGE_BASENAME="JoyBridge-$SAFE_VERSION-local-test"
 ZIP_PATH="$DIST_DIR/$PACKAGE_BASENAME.zip"
+GIT_COMMIT="$(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || printf 'unknown')"
+GIT_TAG="$(git -C "$REPO_ROOT" describe --tags --exact-match HEAD 2>/dev/null || printf 'none')"
+if [[ -n "$(git -C "$REPO_ROOT" status --porcelain --untracked-files=normal 2>/dev/null || true)" ]]; then
+  GIT_STATUS="dirty"
+else
+  GIT_STATUS="clean"
+fi
 
 echo "==> JoyBridge local package"
 echo "Version: $VERSION"
 echo "Repo: $REPO_ROOT"
+echo "Git commit: $GIT_COMMIT"
+echo "Git tag: $GIT_TAG"
+echo "Git status: $GIT_STATUS"
 echo
 
 if [[ -z "${DEVELOPER_DIR:-}" && -d "/Applications/Xcode.app/Contents/Developer" ]]; then
@@ -58,6 +68,9 @@ cp "$REPO_ROOT/CHANGELOG.md" "$STAGING_DIR/CHANGELOG.md"
 {
   printf '%s\n' "JoyBridge local test package"
   printf '%s\n' "Version: $VERSION"
+  printf '%s\n' "Git commit: $GIT_COMMIT"
+  printf '%s\n' "Git tag: $GIT_TAG"
+  printf '%s\n' "Git status when packaged: $GIT_STATUS"
   printf '\n'
   printf '%s\n' "Important:"
   printf '%s\n' "- This is a local friend-test build, not a notarized public release."

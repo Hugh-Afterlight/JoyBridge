@@ -1,5 +1,65 @@
 # Changelog
 
+## v0.7.0 - 2026-05-11
+
+### English
+
+This update makes JoyBridge easier to test after installation, especially for non-programmer friends.
+
+Changed:
+
+- Added a top-level readiness check panel in the main window.
+- The readiness panel summarizes Accessibility permission, controller connection, target controller status, and mapping output status.
+- Added visible test version information in the main window and menu bar.
+- Updated the menu bar title/icon to reflect important states such as missing permission, paused mappings, and active controller monitoring.
+- Added a `复制诊断信息` button that copies a readable diagnostic summary for feedback.
+- The local package `READ-ME-FIRST.txt` now includes git commit, tag, and clean/dirty status from packaging time.
+- Updated the app bundle marketing version to `0.7.0`.
+- Updated README testing steps and package examples for `v0.7.0`.
+
+Validation:
+
+- Built successfully with Xcode/macOS Debug target.
+- Rebuilt the local test package with `Scripts/package-local-release.sh v0.7.0`.
+- Verified the zip includes `JoyBridge.app`, `README.md`, `CHANGELOG.md`, and `READ-ME-FIRST.txt`.
+- Verified the built app bundle reports `CFBundleShortVersionString = 0.7.0`.
+- Verified the package script still completes and prints package source metadata.
+
+Known limitations:
+
+- This is still a local friend-test package, not a notarized public release.
+- The visible app test version is intended for local release tracking and friend testing.
+- The diagnostic summary is a simple clipboard helper, not a full logging system.
+
+### 中文
+
+本次更新让 JoyBridge 安装后更容易测试，尤其适合发给非程序员朋友试用。
+
+本次更新：
+
+- 主窗口顶部新增运行检查面板。
+- 运行检查面板会汇总辅助功能权限、控制器连接、目标控制器状态和映射输出状态。
+- 主窗口和菜单栏新增可见测试版本信息。
+- 菜单栏标题/图标会根据关键状态变化，例如未授权、映射暂停、正在监听控制器。
+- 新增 `复制诊断信息` 按钮，可以复制一段可读的问题反馈摘要。
+- 本地测试包的 `READ-ME-FIRST.txt` 现在会包含打包时的 git commit、tag 和 clean/dirty 状态。
+- App bundle 的 marketing version 更新为 `0.7.0`。
+- 更新 README 中的测试步骤和 `v0.7.0` 打包示例。
+
+验证结果：
+
+- Xcode/macOS Debug 目标构建成功。
+- 已用 `Scripts/package-local-release.sh v0.7.0` 重新生成本地测试包。
+- 确认 zip 内包含 `JoyBridge.app`、`README.md`、`CHANGELOG.md` 和 `READ-ME-FIRST.txt`。
+- 确认构建后的 App bundle 显示 `CFBundleShortVersionString = 0.7.0`。
+- 确认打包脚本仍可完成，并会输出测试包来源信息。
+
+已知限制：
+
+- 这仍然是本地朋友测试包，不是经过 Apple 公证的正式公开发行版。
+- App 内可见版本号主要用于本地版本追踪和朋友测试。
+- 诊断信息只是简单的剪贴板辅助功能，不是完整日志系统。
+
 ## v0.6.0 - 2026-05-11
 
 ### English
