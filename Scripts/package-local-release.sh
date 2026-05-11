@@ -19,14 +19,32 @@ PACKAGE_BASENAME="JoyBridge-$SAFE_VERSION-local-test"
 ZIP_PATH="$DIST_DIR/$PACKAGE_BASENAME.zip"
 GIT_COMMIT="$(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || printf 'unknown')"
 GIT_TAG="$(git -C "$REPO_ROOT" describe --tags --exact-match HEAD 2>/dev/null || printf 'none')"
+APP_INFO_VERSION="$(awk -F '"' '/currentTestVersion/ { print $2; exit }' "$REPO_ROOT/JoyBridge/Utilities/AppInfo.swift")"
+MARKETING_VERSIONS="$(awk -F '= ' '/MARKETING_VERSION/ { gsub(";", "", $2); print $2 }' "$REPO_ROOT/JoyBridge.xcodeproj/project.pbxproj" | sort -u | tr '\n' ' ' | sed 's/[[:space:]]*$//')"
 if [[ -n "$(git -C "$REPO_ROOT" status --porcelain --untracked-files=normal 2>/dev/null || true)" ]]; then
   GIT_STATUS="dirty"
 else
   GIT_STATUS="clean"
 fi
 
+if [[ "$VERSION" != "local" ]]; then
+  EXPECTED_MARKETING_VERSION="${VERSION#v}"
+
+  if [[ "$APP_INFO_VERSION" != "$VERSION" ]]; then
+    echo "ERROR: package version $VERSION does not match AppInfo.currentTestVersion $APP_INFO_VERSION" >&2
+    exit 1
+  fi
+
+  if [[ "$MARKETING_VERSIONS" != "$EXPECTED_MARKETING_VERSION" ]]; then
+    echo "ERROR: package version $VERSION does not match MARKETING_VERSION values: $MARKETING_VERSIONS" >&2
+    exit 1
+  fi
+fi
+
 echo "==> JoyBridge local package"
 echo "Version: $VERSION"
+echo "AppInfo version: $APP_INFO_VERSION"
+echo "Marketing version: $MARKETING_VERSIONS"
 echo "Repo: $REPO_ROOT"
 echo "Git commit: $GIT_COMMIT"
 echo "Git tag: $GIT_TAG"
@@ -64,6 +82,7 @@ echo "==> Preparing staging folder"
 cp -R "$APP_PATH" "$STAGING_DIR/$APP_NAME"
 cp "$REPO_ROOT/README.md" "$STAGING_DIR/README.md"
 cp "$REPO_ROOT/CHANGELOG.md" "$STAGING_DIR/CHANGELOG.md"
+cp "$REPO_ROOT/FRIEND_TESTING.md" "$STAGING_DIR/FRIEND_TESTING.md"
 cp "$REPO_ROOT/RELEASE_CHECKLIST.md" "$STAGING_DIR/RELEASE_CHECKLIST.md"
 mkdir -p "$STAGING_DIR/Scripts"
 cp "$REPO_ROOT/Scripts/check-release-readiness.sh" "$STAGING_DIR/Scripts/check-release-readiness.sh"
@@ -76,6 +95,7 @@ cp "$REPO_ROOT/Scripts/check-release-readiness.sh" "$STAGING_DIR/Scripts/check-r
   printf '%s\n' "Git status when packaged: $GIT_STATUS"
   printf '\n'
   printf '%s\n' "Important:"
+  printf '%s\n' "- Start with FRIEND_TESTING.md for the shortest install and testing guide."
   printf '%s\n' "- This is a local friend-test build, not a notarized public release."
   printf '%s\n' "- It is signed by Xcode for local testing, not with Developer ID for public distribution."
   printf '%s\n' "- macOS may warn that the app cannot be verified because it is not notarized yet."
@@ -91,6 +111,7 @@ cp "$REPO_ROOT/Scripts/check-release-readiness.sh" "$STAGING_DIR/Scripts/check-r
   printf '%s\n' "- Optional release readiness checker is included at Scripts/check-release-readiness.sh."
   printf '\n'
   printf '%s\n' "中文说明："
+  printf '%s\n' "- 请先看 FRIEND_TESTING.md，里面是最短安装和测试说明。"
   printf '%s\n' "- 这是本地朋友测试包，不是已经公证的正式公开发行版。"
   printf '%s\n' "- 它使用 Xcode 本地测试签名，不是用于公开分发的 Developer ID 签名。"
   printf '%s\n' "- macOS 可能提示无法验证 App，因为当前还没有做 Apple 公证。"

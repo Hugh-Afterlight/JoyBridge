@@ -6,14 +6,14 @@ JoyBridge is currently distributed as a local test `.zip`. A public macOS releas
 
 ## Current Status
 
-- Current test version: `v0.9.0`
+- Current test version: `v0.10.0`
 - Bundle identifier: `cc.afterlight.JoyBridge`
 - Local friend-test package: supported
 - Developer ID public distribution: not ready yet
 - Apple notarization: not performed yet
 - App Store release: out of scope for the current MVP
 
-## What v0.9.0 Adds
+## What v0.10.0 Uses From This Checklist
 
 - A release-readiness checker: `Scripts/check-release-readiness.sh`
 - Release-only Hardened Runtime project setting
@@ -25,19 +25,19 @@ The checker is intentionally safe. It does not upload the app, does not call App
 ## Run The Readiness Check
 
 ```sh
-Scripts/check-release-readiness.sh v0.9.0
+Scripts/check-release-readiness.sh v0.10.0
 ```
 
 To also inspect a built or installed app bundle:
 
 ```sh
-Scripts/check-release-readiness.sh v0.9.0 /Applications/JoyBridge.app
+Scripts/check-release-readiness.sh v0.10.0 /Applications/JoyBridge.app
 ```
 
 Strict mode exits with a non-zero status when warnings are found:
 
 ```sh
-Scripts/check-release-readiness.sh --strict v0.9.0
+Scripts/check-release-readiness.sh --strict v0.10.0
 ```
 
 Expected warnings before a real public release:
@@ -106,14 +106,14 @@ The readiness script only checks whether this environment variable is set. It do
 
 ### 当前状态
 
-- 当前测试版本：`v0.9.0`
+- 当前测试版本：`v0.10.0`
 - Bundle identifier：`cc.afterlight.JoyBridge`
 - 本地朋友测试包：支持
 - Developer ID 公开分发：尚未完成
 - Apple 公证：尚未执行
 - App Store 发布：不属于当前 MVP 范围
 
-### v0.9.0 新增内容
+### v0.10.0 如何使用这份清单
 
 - 发布准备检查脚本：`Scripts/check-release-readiness.sh`
 - Release 配置启用 Hardened Runtime
@@ -125,19 +125,19 @@ The readiness script only checks whether this environment variable is set. It do
 ### 运行检查
 
 ```sh
-Scripts/check-release-readiness.sh v0.9.0
+Scripts/check-release-readiness.sh v0.10.0
 ```
 
 如果还想检查已经构建或安装的 App bundle：
 
 ```sh
-Scripts/check-release-readiness.sh v0.9.0 /Applications/JoyBridge.app
+Scripts/check-release-readiness.sh v0.10.0 /Applications/JoyBridge.app
 ```
 
 严格模式会在发现警告时返回失败：
 
 ```sh
-Scripts/check-release-readiness.sh --strict v0.9.0
+Scripts/check-release-readiness.sh --strict v0.10.0
 ```
 
 真正公开发布前，常见警告包括：

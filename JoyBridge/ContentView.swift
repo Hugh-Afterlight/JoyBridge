@@ -63,7 +63,7 @@ struct ContentView: View {
         GroupBox("调试提示") {
             VStack(alignment: .leading, spacing: 8) {
                 Text("1. 先连接 Joy-Con")
-                Text("2. 授权 Accessibility")
+                Text("2. 授权辅助功能权限（Accessibility）")
                 Text("3. 点击“锁定当前”，避免响应其他蓝牙手柄")
                 Text("4. 修改映射")
                 Text("5. 按下手柄按钮测试")

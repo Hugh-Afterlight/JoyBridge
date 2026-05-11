@@ -1,5 +1,71 @@
 # Changelog
 
+## v0.10.0 - 2026-05-11
+
+### English
+
+This update focuses on the current goal: trusted local use by the owner and a few friends. It does not change controller mapping behavior.
+
+Changed:
+
+- Added `FRIEND_TESTING.md` with the shortest install, approval, Accessibility authorization, controller setup, testing, and feedback steps for non-programmer friends.
+- Updated the local package script so each zip includes `FRIEND_TESTING.md`.
+- Added package-version checks so the local package script stops if the requested package version does not match the app version.
+- Updated `READ-ME-FIRST.txt` package wording to point testers to `FRIEND_TESTING.md` first.
+- Updated in-app permission wording to `辅助功能权限（Accessibility）`.
+- Updated copied diagnostic text to a friend-ready Chinese summary.
+- Updated the visible test version and app bundle marketing version to `v0.10.0`.
+- Updated the app bundle build number to `10`.
+- Updated README and release checklist examples for `v0.10.0`.
+
+Validation:
+
+- Verified `Scripts/package-local-release.sh` and `Scripts/check-release-readiness.sh` with shell syntax checks.
+- Verified `JoyBridge.xcodeproj/project.pbxproj` with `plutil -lint`.
+- Built successfully with Xcode/macOS Debug target.
+- Ran the release-readiness checker for `v0.10.0`; remaining warnings are expected before a clean tag and Developer ID notarization setup.
+- Rebuilt the local test package with `Scripts/package-local-release.sh v0.10.0`.
+- Verified the zip includes `JoyBridge.app`, `FRIEND_TESTING.md`, `README.md`, `CHANGELOG.md`, `RELEASE_CHECKLIST.md`, `READ-ME-FIRST.txt`, and `Scripts/check-release-readiness.sh`.
+- Verified the built app bundle reports `CFBundleShortVersionString = 0.10.0` and `CFBundleVersion = 10`.
+
+Known limitations:
+
+- This is still a trusted local friend-test package, not a notarized public release.
+- Friends still need to approve the app in macOS and grant Accessibility permission manually.
+- JoyBridge still needs to be opened manually after Mac restart.
+
+### 中文
+
+本次更新聚焦当前目标：自己和少量信任朋友本地使用。本次不改变手柄映射行为。
+
+本次更新：
+
+- 新增 `FRIEND_TESTING.md`，用最短路径说明朋友如何安装、允许打开、授权辅助功能、连接手柄、测试和反馈问题。
+- 更新本地打包脚本，让每个 zip 都包含 `FRIEND_TESTING.md`。
+- 新增打包版本检查，如果传入的包版本和 App 版本不一致，脚本会停止，避免打错包。
+- 更新测试包内 `READ-ME-FIRST.txt` 的说明，引导测试者优先阅读 `FRIEND_TESTING.md`。
+- App 内权限文案统一为 `辅助功能权限（Accessibility）`。
+- `复制诊断信息` 改成更适合朋友直接发回来的中文摘要。
+- 可见测试版本和 App bundle marketing version 更新为 `v0.10.0`。
+- App bundle build number 更新为 `10`。
+- 更新 README 和发布检查清单中的 `v0.10.0` 示例。
+
+验证结果：
+
+- 已对 `Scripts/package-local-release.sh` 和 `Scripts/check-release-readiness.sh` 做 shell 语法检查。
+- 已用 `plutil -lint` 检查 `JoyBridge.xcodeproj/project.pbxproj`。
+- Xcode/macOS Debug 目标构建成功。
+- 已运行 `v0.10.0` 发布准备检查；clean tag 和 Developer ID 公证配置完成前，剩余警告属于预期状态。
+- 已用 `Scripts/package-local-release.sh v0.10.0` 重新生成本地测试包。
+- 确认 zip 内包含 `JoyBridge.app`、`FRIEND_TESTING.md`、`README.md`、`CHANGELOG.md`、`RELEASE_CHECKLIST.md`、`READ-ME-FIRST.txt` 和 `Scripts/check-release-readiness.sh`。
+- 确认构建后的 App bundle 显示 `CFBundleShortVersionString = 0.10.0`、`CFBundleVersion = 10`。
+
+已知限制：
+
+- 这仍然是可信朋友之间的本地测试包，不是经过 Apple 公证的正式公开发行版。
+- 朋友仍然需要在 macOS 中手动允许打开 App，并手动授权辅助功能权限。
+- Mac 重启后仍需要手动打开 JoyBridge。
+
 ## v0.9.0 - 2026-05-11
 
 ### English

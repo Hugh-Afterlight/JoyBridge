@@ -7,7 +7,7 @@ struct PermissionStatusView: View {
         GroupBox("权限状态") {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 14) {
-                    Text("Accessibility 权限：")
+                    Text("辅助功能权限（Accessibility）：")
                     Text(accessibilityPermissionManager.isTrusted ? "已授权" : "未授权")
                         .fontWeight(.semibold)
                         .foregroundStyle(accessibilityPermissionManager.isTrusted ? .green : .red)

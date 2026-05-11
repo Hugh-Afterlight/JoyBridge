@@ -181,16 +181,17 @@ struct ReadinessStatusView: View {
 
     private func copyDiagnosticSummary() {
         let summary = [
-            "JoyBridge Diagnostic Summary",
-            "Version: \(AppInfo.currentTestVersion)",
-            "Bundle ID: \(AppInfo.bundleIdentifier)",
-            "App Path: \(accessibilityPermissionManager.currentAppPath)",
-            "Accessibility: \(accessibilityPermissionManager.isTrusted ? "granted" : "missing")",
-            "Mapping Output: \(mappingManager.isMappingPaused ? "paused" : "enabled")",
-            "Connected Controller: \(controllerManager.connectedControllerName ?? "none")",
-            "Target Controller: \(targetControllerStatus)",
-            "Target Controller Name: \(controllerManager.selectedTargetControllerName ?? "none")",
-            "Latest Button: \(controllerManager.latestPressedButton?.displayName ?? "none")"
+            "JoyBridge 诊断信息",
+            "版本：\(AppInfo.currentTestVersion)",
+            "Bundle ID：\(AppInfo.bundleIdentifier)",
+            "App 路径：\(accessibilityPermissionManager.currentAppPath)",
+            "辅助功能权限（Accessibility）：\(accessibilityPermissionManager.isTrusted ? "已授权" : "未授权")",
+            "映射输出：\(mappingManager.isMappingPaused ? "已暂停" : "已启用")",
+            "当前控制器：\(controllerManager.connectedControllerName ?? "未连接")",
+            "目标控制器状态：\(targetControllerStatus)",
+            "目标控制器名称：\(controllerManager.selectedTargetControllerName ?? "未设置")",
+            "最近按键：\(controllerManager.latestPressedButton?.displayName ?? "无")",
+            "反馈时请补充：你按了哪个手柄按钮、期望发生什么、实际发生了什么。"
         ].joined(separator: "\n")
 
         NSPasteboard.general.clearContents()
