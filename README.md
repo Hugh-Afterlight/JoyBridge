@@ -6,9 +6,9 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 
 ## Current Test Version
 
-Latest shared test version: `v0.5.0` / `2026-05-11`
+Latest shared test version: `v0.5.1` / `2026-05-11`
 
-This version adds a local packaging script for friend-test builds. It can create a Release build and package JoyBridge as a local `.zip` artifact under `dist/`. This is still not a notarized public release. See [CHANGELOG.md](CHANGELOG.md) for details.
+This version improves the local friend-test package instructions for macOS Gatekeeper first-open warnings. This is still not a notarized public release. See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## MVP Features
 
@@ -90,13 +90,13 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 After the app works from Xcode, you can create a local friend-test package:
 
 ```sh
-Scripts/package-local-release.sh v0.5.0
+Scripts/package-local-release.sh v0.5.1
 ```
 
 The script builds the Release app and writes the package to:
 
 ```text
-dist/JoyBridge-v0.5.0-local-test.zip
+dist/JoyBridge-v0.5.1-local-test.zip
 ```
 
 Important notes:
@@ -109,6 +109,29 @@ Important notes:
 - Accessibility permission must be granted to the installed copy of JoyBridge. If an older Xcode build was authorized before, remove and re-add JoyBridge in Accessibility settings.
 - `spctl` may report `rejected` or an internal code-signing error for this local package. That means it is not a notarized public release.
 - The package is not committed to Git. `dist/` is ignored on purpose.
+
+### If macOS Blocks JoyBridge
+
+If you see a dialog like `Apple cannot verify JoyBridge`, do not move it to Trash if you trust this local test build.
+
+Recommended path:
+
+1. Click Done in the warning dialog.
+2. Open System Settings > Privacy & Security.
+3. Scroll to Security.
+4. Click Open Anyway for JoyBridge.
+5. Enter your Mac login password if asked.
+6. Open JoyBridge again.
+
+Apple usually shows the Open Anyway button for about one hour after you try to open the app.
+
+Local tester fallback:
+
+```sh
+xattr -dr com.apple.quarantine /Applications/JoyBridge.app
+```
+
+Only use this fallback for a JoyBridge build you trust. It removes macOS's download quarantine flag for this app.
 
 ## Testing
 
@@ -202,9 +225,9 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 ## 当前测试版本
 
-最新共享测试版本：`v0.5.0` / `2026-05-11`
+最新共享测试版本：`v0.5.1` / `2026-05-11`
 
-这个版本新增了本地测试包脚本，可以构建 Release 版本，并在 `dist/` 下生成给朋友测试的 `.zip` 包。它还不是经过 Apple 公证的正式公开发行版。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+这个版本改进了本地朋友测试包在 macOS Gatekeeper 首次打开被拦截时的处理说明。它还不是经过 Apple 公证的正式公开发行版。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
 
 ## MVP 功能
 
@@ -286,13 +309,13 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 确认 App 可以从 Xcode 正常运行后，可以生成一个给朋友测试的本地包：
 
 ```sh
-Scripts/package-local-release.sh v0.5.0
+Scripts/package-local-release.sh v0.5.1
 ```
 
 脚本会构建 Release 版本，并把测试包输出到：
 
 ```text
-dist/JoyBridge-v0.5.0-local-test.zip
+dist/JoyBridge-v0.5.1-local-test.zip
 ```
 
 重要提醒：
@@ -305,6 +328,29 @@ dist/JoyBridge-v0.5.0-local-test.zip
 - 必须给安装后的这个 JoyBridge 授权辅助功能权限。如果以前授权的是 Xcode 构建版本，需要在辅助功能设置里移除并重新添加 JoyBridge。
 - `spctl` 可能会对这个本地测试包显示 `rejected` 或代码签名内部错误。这表示它还不是经过 Apple 公证的正式公开发行版。
 - 测试包不会提交到 Git。`dist/` 会被故意忽略。
+
+### 如果 macOS 拦截 JoyBridge
+
+如果看到类似 `Apple 无法验证 JoyBridge` 的弹窗，只要你确认这是可信的本地测试包，就不要点击移到废纸篓。
+
+推荐处理方式：
+
+1. 在弹窗里点击完成。
+2. 打开 系统设置 > 隐私与安全性。
+3. 滚动到安全性区域。
+4. 找到 JoyBridge，点击仍要打开。
+5. 如果系统要求，输入你的 Mac 登录密码。
+6. 再次打开 JoyBridge。
+
+Apple 通常只会在你尝试打开 App 后约一小时内显示仍要打开按钮。
+
+本地测试者备用方式：
+
+```sh
+xattr -dr com.apple.quarantine /Applications/JoyBridge.app
+```
+
+只有在你确认这个 JoyBridge 测试包可信时，才使用这个备用命令。它会移除这个 App 的 macOS 下载隔离标记。
 
 ## 测试方法
 
