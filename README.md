@@ -6,9 +6,9 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 
 ## Current Test Version
 
-Latest shared test version: `v0.7.0` / `2026-05-11`
+Latest shared test version: `v0.8.0` / `2026-05-11`
 
-This version adds an in-app readiness check panel, visible version information, clearer menu bar status, and a copyable diagnostic summary for friend testing. This is still not a notarized public release. See [CHANGELOG.md](CHANGELOG.md) for details.
+This version adds a real macOS App icon and a repeatable icon generation script, so installed test builds look more complete in Finder, Dock, and system permission lists. This is still not a notarized public release. See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## MVP Features
 
@@ -24,6 +24,7 @@ This version adds an in-app readiness check panel, visible version information, 
 - Global pause/resume switch for temporarily disabling all keyboard output
 - Readiness check panel for Accessibility, controller connection, target lock, and mapping output status
 - Copyable diagnostic summary for easier friend-test feedback
+- Custom macOS App icon generated into `Assets.xcassets`
 - Local packaging script for creating friend-test `.zip` builds
 - Package source summary with git commit, tag, and clean/dirty status in `READ-ME-FIRST.txt`
 - Controller status, latest pressed button, and editable mapping list in the UI
@@ -94,19 +95,19 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 After the app works from Xcode, you can create a local friend-test package:
 
 ```sh
-Scripts/package-local-release.sh v0.7.0
+Scripts/package-local-release.sh v0.8.0
 ```
 
 The script builds the Release app and writes the package to:
 
 ```text
-dist/JoyBridge-v0.7.0-local-test.zip
+dist/JoyBridge-v0.8.0-local-test.zip
 ```
 
 Important notes:
 
 - This package is for local friend testing only.
-- It is signed with Apple Development for testing, not Developer ID for public distribution.
+- It is signed by Xcode for local testing, not with Developer ID for public distribution.
 - It is not notarized by Apple yet, so macOS may show a security warning when opening it after download.
 - Friends may need to right-click JoyBridge and choose Open, or approve it in System Settings > Privacy & Security.
 - Recommended order: unzip the package, move `JoyBridge.app` to `/Applications`, open it, then grant Accessibility permission.
@@ -157,6 +158,7 @@ Only use this fallback for a JoyBridge build you trust. It removes macOS's downl
 15. Click `暂停映射`, press controller buttons, and confirm `最近按键` still updates but no keyboard input is sent.
 16. Click `启用映射` and confirm mappings work again.
 17. Click `复制诊断信息` and confirm a readable summary is copied for feedback.
+18. Confirm JoyBridge uses the custom icon in Finder, Dock, and the Accessibility permission list.
 
 After a target controller is locked, JoyBridge should only respond to that saved controller. If the target controller is not connected, JoyBridge should not automatically switch to another Bluetooth controller.
 
@@ -206,15 +208,18 @@ JoyBridge/
     MappingAction.swift
 
   Utilities/
+    AppInfo.swift
     KeyboardEventSender.swift
 
   Views/
+    ReadinessStatusView.swift
     MappingListView.swift
     MappingRowView.swift
     PermissionStatusView.swift
     ControllerStatusView.swift
 
 Scripts/
+  generate-app-icon.swift
   package-local-release.sh
 ```
 
@@ -236,9 +241,9 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 ## 当前测试版本
 
-最新共享测试版本：`v0.7.0` / `2026-05-11`
+最新共享测试版本：`v0.8.0` / `2026-05-11`
 
-这个版本新增 App 内运行检查面板、可见版本信息、更清楚的菜单栏状态和可复制诊断信息，方便朋友测试时判断当前是否可用。它还不是经过 Apple 公证的正式公开发行版。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+这个版本新增真正的 macOS App 图标和可重复运行的图标生成脚本，让安装后的测试版在 Finder、Dock 和系统权限列表里更像一个完整 App。它还不是经过 Apple 公证的正式公开发行版。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
 
 ## MVP 功能
 
@@ -254,6 +259,7 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 - 支持全局暂停/启用映射，用于临时停止所有键盘输出
 - 支持运行检查面板，用于汇总辅助功能、控制器连接、目标锁定和映射输出状态
 - 支持复制诊断信息，方便朋友测试时反馈问题
+- 支持自定义 macOS App 图标，并生成到 `Assets.xcassets`
 - 支持本地打包脚本，用于生成朋友测试版 `.zip`
 - 测试包内的 `READ-ME-FIRST.txt` 会显示打包时的 git commit、tag 和工作区 clean/dirty 状态
 - 界面显示控制器状态、最近按下按钮和可编辑映射列表
@@ -324,19 +330,19 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 确认 App 可以从 Xcode 正常运行后，可以生成一个给朋友测试的本地包：
 
 ```sh
-Scripts/package-local-release.sh v0.7.0
+Scripts/package-local-release.sh v0.8.0
 ```
 
 脚本会构建 Release 版本，并把测试包输出到：
 
 ```text
-dist/JoyBridge-v0.7.0-local-test.zip
+dist/JoyBridge-v0.8.0-local-test.zip
 ```
 
 重要提醒：
 
 - 这个包只适合本地朋友测试。
-- 它使用 Apple Development 测试签名，不是用于公开分发的 Developer ID 签名。
+- 它使用 Xcode 本地测试签名，不是用于公开分发的 Developer ID 签名。
 - 它还没有经过 Apple 公证，所以下载后打开时 macOS 可能会显示安全提醒。
 - 朋友可能需要右键点击 JoyBridge 后选择打开，或在 系统设置 > 隐私与安全性 中手动允许。
 - 建议顺序：先解压测试包，把 `JoyBridge.app` 移到“应用程序”，再打开，再授权辅助功能权限。
@@ -387,6 +393,7 @@ xattr -dr com.apple.quarantine /Applications/JoyBridge.app
 15. 点击 `暂停映射`，按手柄按钮，确认 `最近按键` 仍会更新，但不会发送键盘输入。
 16. 点击 `启用映射`，确认映射重新生效。
 17. 点击 `复制诊断信息`，确认可以复制一段可读的问题反馈摘要。
+18. 确认 JoyBridge 在 Finder、Dock 和辅助功能权限列表中显示自定义图标。
 
 锁定目标控制器后，JoyBridge 应该只响应这个已保存的控制器。如果目标控制器没有连接，JoyBridge 不应该自动切换到其他蓝牙手柄。
 
@@ -436,15 +443,18 @@ JoyBridge/
     MappingAction.swift
 
   Utilities/
+    AppInfo.swift
     KeyboardEventSender.swift
 
   Views/
+    ReadinessStatusView.swift
     MappingListView.swift
     MappingRowView.swift
     PermissionStatusView.swift
     ControllerStatusView.swift
 
 Scripts/
+  generate-app-icon.swift
   package-local-release.sh
 ```
 

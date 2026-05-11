@@ -1,5 +1,67 @@
 # Changelog
 
+## v0.8.0 - 2026-05-11
+
+### English
+
+This update improves the installed app appearance by adding a real macOS App icon.
+
+Changed:
+
+- Added generated macOS AppIcon PNG assets for all required macOS icon sizes.
+- Replaced the empty AppIcon asset catalog entries with filename-backed macOS icon slots.
+- Added `Scripts/generate-app-icon.swift` so the icon set can be regenerated without third-party dependencies.
+- Updated the visible test version and app bundle marketing version to `v0.8.0`.
+- Updated README package examples and testing steps for icon verification.
+- Removed local personal signing settings from the shared project file so test packages can be built from a clean worktree.
+- Updated package wording to describe Xcode local test signing instead of assuming Apple Development signing.
+
+Validation:
+
+- Regenerated AppIcon PNG files with `Scripts/generate-app-icon.swift`.
+- Verified all generated AppIcon PNG pixel sizes with `sips`.
+- Built successfully with Xcode/macOS Debug target.
+- Verified Xcode generated `AppIcon.icns` and `Assets.car` during asset catalog compilation.
+- Rebuilt the local test package with `Scripts/package-local-release.sh v0.8.0`.
+- Verified the zip includes `JoyBridge.app`, `README.md`, `CHANGELOG.md`, and `READ-ME-FIRST.txt`.
+- Verified the built app bundle reports `CFBundleShortVersionString = 0.8.0`.
+- Verified the package source metadata reports tag `v0.8.0` and clean worktree.
+
+Known limitations:
+
+- This is still a local friend-test package, not a notarized public release.
+- The icon is a simple generated MVP icon and can be replaced by a polished designer-made icon later.
+
+### 中文
+
+本次更新改进安装后的 App 观感，新增真正的 macOS App 图标。
+
+本次更新：
+
+- 新增覆盖所有 macOS 必需尺寸的 AppIcon PNG 资源。
+- 将原本空的 AppIcon 资源槽位替换为带 `filename` 的 macOS 图标配置。
+- 新增 `Scripts/generate-app-icon.swift`，不用第三方依赖即可重新生成图标资源。
+- 可见测试版本和 App bundle marketing version 更新为 `v0.8.0`。
+- 更新 README 中的打包示例和图标验证步骤。
+- 移除共享项目文件里的本机个人签名设置，方便从 clean worktree 生成测试包。
+- 更新测试包说明，改为描述 Xcode 本地测试签名，不再假设一定使用 Apple Development 签名。
+
+验证结果：
+
+- 已用 `Scripts/generate-app-icon.swift` 重新生成 AppIcon PNG 文件。
+- 已用 `sips` 确认所有 AppIcon PNG 的像素尺寸正确。
+- Xcode/macOS Debug 目标构建成功。
+- 确认 Xcode 在资源编译时生成了 `AppIcon.icns` 和 `Assets.car`。
+- 已用 `Scripts/package-local-release.sh v0.8.0` 重新生成本地测试包。
+- 确认 zip 内包含 `JoyBridge.app`、`README.md`、`CHANGELOG.md` 和 `READ-ME-FIRST.txt`。
+- 确认构建后的 App bundle 显示 `CFBundleShortVersionString = 0.8.0`。
+- 确认测试包来源信息显示 tag `v0.8.0` 且工作区为 clean。
+
+已知限制：
+
+- 这仍然是本地朋友测试包，不是经过 Apple 公证的正式公开发行版。
+- 当前图标是简单生成的 MVP 图标，后续可以替换为更精修的设计版本。
+
 ## v0.7.0 - 2026-05-11
 
 ### English
