@@ -6,9 +6,9 @@ It is not a game utility. The goal is simple: turn controller buttons into custo
 
 ## Current Test Version
 
-Latest shared test version: `v0.8.0` / `2026-05-11`
+Latest shared test version: `v0.9.0` / `2026-05-11`
 
-This version adds a real macOS App icon and a repeatable icon generation script, so installed test builds look more complete in Finder, Dock, and system permission lists. This is still not a notarized public release. See [CHANGELOG.md](CHANGELOG.md) for details.
+This version adds a safe release-readiness checklist and checker script for future Developer ID signing and Apple notarization preparation. It is still a local friend-test build, not a notarized public release. See [CHANGELOG.md](CHANGELOG.md) and [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for details.
 
 ## MVP Features
 
@@ -27,6 +27,7 @@ This version adds a real macOS App icon and a repeatable icon generation script,
 - Custom macOS App icon generated into `Assets.xcassets`
 - Local packaging script for creating friend-test `.zip` builds
 - Package source summary with git commit, tag, and clean/dirty status in `READ-ME-FIRST.txt`
+- Release-readiness checker for future Developer ID signing and Apple notarization preparation
 - Controller status, latest pressed button, and editable mapping list in the UI
 
 ## Supported Controller Inputs
@@ -95,13 +96,13 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 After the app works from Xcode, you can create a local friend-test package:
 
 ```sh
-Scripts/package-local-release.sh v0.8.0
+Scripts/package-local-release.sh v0.9.0
 ```
 
 The script builds the Release app and writes the package to:
 
 ```text
-dist/JoyBridge-v0.8.0-local-test.zip
+dist/JoyBridge-v0.9.0-local-test.zip
 ```
 
 Important notes:
@@ -114,7 +115,25 @@ Important notes:
 - Accessibility permission must be granted to the installed copy of JoyBridge. If an older Xcode build was authorized before, remove and re-add JoyBridge in Accessibility settings.
 - `spctl` may report `rejected` or an internal code-signing error for this local package. That means it is not a notarized public release.
 - `READ-ME-FIRST.txt` includes the git commit, tag, and whether the worktree was clean or dirty when packaged.
+- `RELEASE_CHECKLIST.md` is included for future public release preparation notes.
+- `Scripts/check-release-readiness.sh` is included as an optional read-only checker.
 - The package is not committed to Git. `dist/` is ignored on purpose.
+
+## Release Readiness Check
+
+v0.9.0 adds a read-only checker for the future public release path:
+
+```sh
+Scripts/check-release-readiness.sh v0.9.0
+```
+
+After building or installing an app, you can also check that app bundle:
+
+```sh
+Scripts/check-release-readiness.sh v0.9.0 /Applications/JoyBridge.app
+```
+
+For the current local friend-test package, some warnings are expected. For example, the app is not signed with Developer ID yet, notarization credentials may not be configured, and there may be no stapled notarization ticket. Those warnings are a reminder that this package is for testing, not public distribution.
 
 ### If macOS Blocks JoyBridge
 
@@ -219,8 +238,11 @@ JoyBridge/
     ControllerStatusView.swift
 
 Scripts/
+  check-release-readiness.sh
   generate-app-icon.swift
   package-local-release.sh
+
+RELEASE_CHECKLIST.md
 ```
 
 ## Roadmap
@@ -241,9 +263,9 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 
 ## 当前测试版本
 
-最新共享测试版本：`v0.8.0` / `2026-05-11`
+最新共享测试版本：`v0.9.0` / `2026-05-11`
 
-这个版本新增真正的 macOS App 图标和可重复运行的图标生成脚本，让安装后的测试版在 Finder、Dock 和系统权限列表里更像一个完整 App。它还不是经过 Apple 公证的正式公开发行版。详细更新请看 [CHANGELOG.md](CHANGELOG.md)。
+这个版本新增安全的发布准备清单和检查脚本，用于后续 Developer ID 签名和 Apple 公证准备。它仍然是本地朋友测试版，不是经过 Apple 公证的正式公开发行版。详细更新请看 [CHANGELOG.md](CHANGELOG.md) 和 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)。
 
 ## MVP 功能
 
@@ -262,6 +284,7 @@ JoyBridge 是一个 macOS 原生生产力工具，用于把 Nintendo Joy-Con、S
 - 支持自定义 macOS App 图标，并生成到 `Assets.xcassets`
 - 支持本地打包脚本，用于生成朋友测试版 `.zip`
 - 测试包内的 `READ-ME-FIRST.txt` 会显示打包时的 git commit、tag 和工作区 clean/dirty 状态
+- 支持发布准备检查脚本，用于后续 Developer ID 签名和 Apple 公证准备
 - 界面显示控制器状态、最近按下按钮和可编辑映射列表
 
 ## 支持的手柄按钮
@@ -330,13 +353,13 @@ tccutil reset Accessibility cc.afterlight.JoyBridge
 确认 App 可以从 Xcode 正常运行后，可以生成一个给朋友测试的本地包：
 
 ```sh
-Scripts/package-local-release.sh v0.8.0
+Scripts/package-local-release.sh v0.9.0
 ```
 
 脚本会构建 Release 版本，并把测试包输出到：
 
 ```text
-dist/JoyBridge-v0.8.0-local-test.zip
+dist/JoyBridge-v0.9.0-local-test.zip
 ```
 
 重要提醒：
@@ -349,7 +372,25 @@ dist/JoyBridge-v0.8.0-local-test.zip
 - 必须给安装后的这个 JoyBridge 授权辅助功能权限。如果以前授权的是 Xcode 构建版本，需要在辅助功能设置里移除并重新添加 JoyBridge。
 - `spctl` 可能会对这个本地测试包显示 `rejected` 或代码签名内部错误。这表示它还不是经过 Apple 公证的正式公开发行版。
 - `READ-ME-FIRST.txt` 会显示打包时的 git commit、tag，以及工作区当时是 clean 还是 dirty。
+- 测试包内会包含 `RELEASE_CHECKLIST.md`，用于说明后续公开发布前要注意的事项。
+- 测试包内会包含 `Scripts/check-release-readiness.sh`，作为可选的只读检查工具。
 - 测试包不会提交到 Git。`dist/` 会被故意忽略。
+
+## 发布准备检查
+
+v0.9.0 新增一个只读检查脚本，用于后续公开发布准备：
+
+```sh
+Scripts/check-release-readiness.sh v0.9.0
+```
+
+构建或安装 App 后，也可以检查具体的 App bundle：
+
+```sh
+Scripts/check-release-readiness.sh v0.9.0 /Applications/JoyBridge.app
+```
+
+对当前本地朋友测试包来说，出现一些警告是正常的。例如：App 还不是 Developer ID 签名，还没有配置公证凭证，也没有附加 Apple 公证票据。这些警告是在提醒我们：当前包适合测试，还不适合公开分发。
 
 ### 如果 macOS 拦截 JoyBridge
 
@@ -454,8 +495,11 @@ JoyBridge/
     ControllerStatusView.swift
 
 Scripts/
+  check-release-readiness.sh
   generate-app-icon.swift
   package-local-release.sh
+
+RELEASE_CHECKLIST.md
 ```
 
 ## 后续方向

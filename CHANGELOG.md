@@ -1,5 +1,71 @@
 # Changelog
 
+## v0.9.0 - 2026-05-11
+
+### English
+
+This update prepares JoyBridge for the next step toward a real installable macOS release. It does not change controller mapping behavior.
+
+Changed:
+
+- Added `RELEASE_CHECKLIST.md` with a plain-language path from local friend-test builds to future Developer ID signing and Apple notarization.
+- Added `Scripts/check-release-readiness.sh`, a read-only release checker for version consistency, git status, Xcode tools, Developer ID certificate presence, Hardened Runtime, App icon assets, and optional built-app checks.
+- Enabled Hardened Runtime for the Release configuration as a public distribution prerequisite.
+- Updated the visible test version and app bundle marketing version to `v0.9.0`.
+- Updated the app bundle build number to `9` for clearer release tracking.
+- Updated `Scripts/package-local-release.sh` so the local test package includes `RELEASE_CHECKLIST.md` and the optional read-only readiness checker.
+- Updated README package examples and release-readiness notes for `v0.9.0`.
+
+Validation:
+
+- Verified `Scripts/check-release-readiness.sh` and `Scripts/package-local-release.sh` with shell syntax checks.
+- Verified `JoyBridge.xcodeproj/project.pbxproj` with `plutil -lint`.
+- Built successfully with Xcode/macOS Debug target.
+- Ran the release-readiness checker for `v0.9.0`; remaining warnings are expected for local testing until Developer ID certificate and notarization credentials are configured.
+- Rebuilt the local test package with `Scripts/package-local-release.sh v0.9.0`.
+- Verified the zip includes `JoyBridge.app`, `README.md`, `CHANGELOG.md`, `RELEASE_CHECKLIST.md`, `READ-ME-FIRST.txt`, and `Scripts/check-release-readiness.sh`.
+- Verified the built app bundle reports `CFBundleShortVersionString = 0.9.0` and `CFBundleVersion = 9`.
+- Ran the release-readiness checker against the built app bundle; Hardened Runtime is present and local-test signing/notarization warnings are expected.
+
+Known limitations:
+
+- This is still a local friend-test package, not a notarized public release.
+- The local test package may still show expected release-readiness warnings such as missing Developer ID signing, missing notary profile, or missing stapled notarization ticket.
+- Actual public distribution still requires an Apple Developer Program membership, Developer ID certificates, notarization credentials, and a manual Apple notarization step.
+- Current builds are still focused on Apple Silicon unless a Universal build is added later.
+
+### 中文
+
+本次更新为 JoyBridge 后续变成真正可安装、可公开分发的 macOS App 做准备。本次不改变手柄映射行为。
+
+本次更新：
+
+- 新增 `RELEASE_CHECKLIST.md`，用简单语言说明从本地朋友测试包走向 Developer ID 签名和 Apple 公证需要做什么。
+- 新增 `Scripts/check-release-readiness.sh`，这是只读发布检查脚本，会检查版本一致性、git 状态、Xcode 工具、Developer ID 证书是否存在、Hardened Runtime、App 图标资源，以及可选的已构建 App 检查。
+- Release 配置启用 Hardened Runtime，这是后续公开分发的重要前提。
+- 可见测试版本和 App bundle marketing version 更新为 `v0.9.0`。
+- App bundle build number 更新为 `9`，方便后续版本追踪。
+- 更新 `Scripts/package-local-release.sh`，让本地测试包包含 `RELEASE_CHECKLIST.md` 和可选的只读发布检查脚本。
+- 更新 README 中的 `v0.9.0` 打包示例和发布准备说明。
+
+验证结果：
+
+- 已对 `Scripts/check-release-readiness.sh` 和 `Scripts/package-local-release.sh` 做 shell 语法检查。
+- 已用 `plutil -lint` 检查 `JoyBridge.xcodeproj/project.pbxproj`。
+- Xcode/macOS Debug 目标构建成功。
+- 已运行 `v0.9.0` 发布准备检查；在配置 Developer ID 证书和公证凭证前，剩余警告属于本地测试阶段的预期状态。
+- 已用 `Scripts/package-local-release.sh v0.9.0` 重新生成本地测试包。
+- 确认 zip 内包含 `JoyBridge.app`、`README.md`、`CHANGELOG.md`、`RELEASE_CHECKLIST.md`、`READ-ME-FIRST.txt` 和 `Scripts/check-release-readiness.sh`。
+- 确认构建后的 App bundle 显示 `CFBundleShortVersionString = 0.9.0`、`CFBundleVersion = 9`。
+- 已对构建后的 App bundle 运行发布准备检查；Hardened Runtime 存在，本地测试签名/公证相关警告符合预期。
+
+已知限制：
+
+- 这仍然是本地朋友测试包，不是经过 Apple 公证的正式公开发行版。
+- 当前本地测试包可能仍会出现一些预期内的发布检查警告，例如没有 Developer ID 签名、没有 notary profile、没有附加 Apple 公证票据。
+- 真正公开分发仍然需要 Apple Developer Program 会员资格、Developer ID 证书、公证凭证，以及手动执行 Apple 公证步骤。
+- 当前构建仍然优先面向 Apple Silicon，除非后续增加 Universal 构建。
+
 ## v0.8.0 - 2026-05-11
 
 ### English
